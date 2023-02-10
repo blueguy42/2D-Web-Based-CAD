@@ -1,0 +1,10 @@
+/* Set style for canvas */
+canvas {
+  border: 1px solid #000;
+  margin:auto;
+}
+
+h1 {
+    font-weight: bold;
+    text-align: center;
+}
