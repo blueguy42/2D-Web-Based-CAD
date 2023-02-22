@@ -6,6 +6,8 @@ const btn_line = document.getElementById('btn-line');
 const btn_square = document.getElementById('btn-square');
 const btn_rectangle = document.getElementById('btn-rectangle');
 const btn_polygon = document.getElementById('btn-polygon');
+const btn_coor = document.getElementById('btn-coor');
+const btn_convex = document.getElementById('btn-convex');
 
 var chosenColor = getRandomColor();
 
@@ -17,6 +19,8 @@ var modeLine = 0;
 var modeSquare = 0;
 var modeRectangle = 0;
 var modePolygon = 0;
+var modeCoordinate = 0;
+var modeConvex = 0;
 
 colorWheel.value = chosenColor;
 colorLabel.innerText = chosenColor
@@ -40,14 +44,19 @@ canvas.addEventListener('mousemove', function(e) {
             canvasLabel.innerText += "Drawing rectangle";
         } else if (modePolygon != 0) {
             canvasLabel.innerText += "Drawing polygon";
+            if (modeConvex == 1) {
+                canvasLabel.innerText += "\nConvex mode";
+            } else {
+                canvasLabel.innerText += "\nNon-convex mode";
+            }
         }
         canvasLabel.innerText += "\n";
 
         crosshair = [];
         let crosshairX = new Line(crosshair.length);
-        crosshairX.setLine(new Coordinate([0, coordinate[1]]), new Color("#d1d1d1"), new Coordinate([canvas.clientWidth, coordinate[1]]), new Color("#777777"));
+        crosshairX.setLine(new Coordinate([0, coordinate[1]]), new Color("#777777"), new Coordinate([canvas.clientWidth, coordinate[1]]), new Color("#777777"));
         let crosshairY = new Line(crosshair.length);
-        crosshairY.setLine(new Coordinate([coordinate[0], 0]), new Color("#d1d1d1"), new Coordinate([coordinate[0], canvas.clientHeight]), new Color("#777777"));
+        crosshairY.setLine(new Coordinate([coordinate[0], 0]), new Color("#777777"), new Coordinate([coordinate[0], canvas.clientHeight]), new Color("#777777"));
         crosshair.push(crosshairX);
         crosshair.push(crosshairY);
     } else {
@@ -62,7 +71,12 @@ canvas.addEventListener('mousemove', function(e) {
     } else if (modePolygon == 2) {
         tempModel[0].setLastCorner(new Coordinate(coordinate), new Color(chosenColor));
     }
-    canvasLabel.innerText += "x: " + getCanvastoWebGL_X(canvas, coordinate[0]).toFixed(4) + "\ny: " + getCanvastoWebGL_Y(canvas, coordinate[1]).toFixed(4);
+    if (modeCoordinate == 0) {
+        canvasLabel.innerText += "x: " + getCanvastoWebGL_X(canvas, coordinate[0]).toFixed(4) + "\ny: " + getCanvastoWebGL_Y(canvas, coordinate[1]).toFixed(4);
+    } else {
+        canvasLabel.innerText += "x: " + coordinate[0].toFixed(4) + "\ny: " + coordinate[1].toFixed(4);
+
+    }
 })
 
 canvas.addEventListener('click', function(e) {
@@ -96,7 +110,7 @@ canvas.addEventListener('click', function(e) {
         tempModel.pop();
         modeRectangle = 1;
     } else if (modePolygon == 1) {
-        tempModel.push(new Polygon(models.length));
+        tempModel.push(new Polygon(models.length, modeConvex));
         tempModel[0].addCorner(new Coordinate(coordinate), new Color(chosenColor));
         tempModel[0].addCorner(new Coordinate(coordinate), new Color(chosenColor));
         modePolygon = 2;
@@ -109,6 +123,7 @@ canvas.addEventListener('dblclick', function(e) {
     let coordinate = getCanvasCoordinate(e);
     if (modePolygon == 2) {
         tempModel[0].addCorner(new Coordinate(coordinate), new Color(chosenColor));
+        tempModel[0].makePolygon();
         models.push(tempModel[0]);
         tempModel.pop();
         modePolygon = 1;
@@ -124,6 +139,11 @@ canvas.addEventListener('mouseleave', function(e) {
         canvasLabel.innerText = "Drawing rectangle";
     } else if (modePolygon != 0) {
         canvasLabel.innerText = "Drawing polygon";
+        if (modeConvex == 1) {
+            canvasLabel.innerText += "\nConvex mode";
+        } else {
+            canvasLabel.innerText += "\nNon-convex mode";
+        }
     } else {
         canvasLabel.innerText = "";
     }
@@ -134,6 +154,32 @@ btn_line.addEventListener('click', function(e) {lineMode()})
 btn_square.addEventListener('click', function(e) {squareMode()})
 btn_rectangle.addEventListener('click', function(e) {rectangleMode()})
 btn_polygon.addEventListener('click', function(e) {polygonMode()})
+btn_coor.addEventListener('click', function(e) {coordinateMode()})
+btn_convex.addEventListener('click', function(e) {convexMode()})
+
+btn_coor.addEventListener('mouseover', function(e) {
+    if (modeCoordinate == 0) {
+        canvasLabel.innerText = "Switch display to canvas coordinate";
+    } else {
+        canvasLabel.innerText = "Switch display to WebGL coordinate";
+    }
+})
+
+btn_convex.addEventListener('mouseover', function(e) {
+    if (modeConvex == 0) {
+        canvasLabel.innerText = "Switch to convex polygon drawing";
+    } else {
+        canvasLabel.innerText = "Switch to non-convex polygon drawing";
+    }
+})
+
+btn_coor.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_convex.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
 
 document.addEventListener('keyup', function(e) {
     if (e.key == "q") {
@@ -144,5 +190,9 @@ document.addEventListener('keyup', function(e) {
         rectangleMode();
     } else if (e.key == "r") {
         polygonMode();
+    } else if (e.key == "v") {
+        coordinateMode();
+    } else if (e.key == "t") {
+        convexMode();
     }
 })

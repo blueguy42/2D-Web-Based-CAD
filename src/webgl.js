@@ -111,7 +111,6 @@ if (!gl) {
     }
 
     crosshair.forEach(cross => {
-      console.log(cross);
       cross.render();
     });
     

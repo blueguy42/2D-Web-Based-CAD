@@ -52,6 +52,7 @@ div#wrapper {
   margin: 8px 0;
   border: 1px solid;
   border-radius: 15px;
+  transition-duration: 300ms;
 }
 
 .button-shape:hover {
@@ -73,6 +74,20 @@ div#wrapper {
   background-color: #56de5a;
   color: white;
   border-color: #56de5a;
+  transition-duration: 300ms;
+}
+
+button.btn-coor-webgl{
+  background-color: #4328da;
+  color: white;
+  border-color: #4328da;
+  transition-duration: 300ms;
+}
+
+button.btn-coor-canvas{
+  background-color: #f54332;
+  color: white;
+  border-color: #f54332;
   transition-duration: 300ms;
 }
 

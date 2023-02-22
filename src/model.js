@@ -308,9 +308,10 @@ class Guide extends Model {
 }
 
 class Polygon extends Model {
-  constructor(id = -1) {
+  constructor(id = -1, convex=false) {
     super(id, "polygon");
     this.guides = [];
+    this.convex = convex;
   }
 
   addCorner = (coordinate1, color1) => {
@@ -324,6 +325,22 @@ class Polygon extends Model {
     this.vertices[this.vertices.length-1].coordinate = coordinate1;
     this.vertices[this.vertices.length-1].color = color1;
     this.guides[this.guides.length-1].setGuide(coordinate1);
+  }
+
+  makePolygon = () => {
+    this.vertices = this.vertices.slice(0, -3);
+    this.guides = this.guides.slice(0, -3);
+    if (this.convex) {
+      this.vertices = convexHull(this.vertices);
+      this.vertices = sortAntiClockwise(this.vertices);
+    this.addCorner(this.vertices[1].coordinate, this.vertices[0].color);
+    this.guides = [];
+    this.vertices.forEach((vertex) => {
+      let guide1 = new Guide(this.guides.length);
+      guide1.setGuide(vertex.coordinate);
+      this.guides.push(guide1);
+    });
+    }
   }
 
   render = () => {
@@ -342,7 +359,6 @@ class Polygon extends Model {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(polygonVertices), gl.STATIC_DRAW);
 
     let indices = [];
-    console.log(this.vertices.length); 
     if (this.vertices.length > 2) {
       for (let i = 0; i < this.vertices.length-2; i++) {
         indices.push(i);
@@ -382,7 +398,11 @@ class Polygon extends Model {
     } else if (this.vertices.length == 2) {
       gl.drawArrays(gl.LINES, 0, this.vertices.length);
     } else {
-      gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT,0);
+      if (this.convex) {
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, this.vertices.length);
+      } else {
+        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT,0);
+      }
     }
   }
 }
