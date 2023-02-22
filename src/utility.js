@@ -35,12 +35,15 @@ lineMode = () => {
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        canvasLabel.innerText = "Drawing line";
         tempModel = [];
         modeLine = 1;
         console.log(`Drawing line`);
     } else if (modeLine == 1 || modeLine == 2) {
         btn_line.classList.remove("button-shape-selected");
+        canvasLabel.innerText = "";
         tempModel = [];
+        crosshair = [];
         modeLine = 0;
     }
 }
@@ -52,12 +55,15 @@ squareMode = () => {
         btn_line.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        canvasLabel.innerText = "Drawing square";
         tempModel = [];
         modeSquare = 1;
         console.log(`Drawing square`);
     } else if (modeSquare == 1 || modeSquare == 2) {
         btn_square.classList.remove("button-shape-selected");
+        canvasLabel.innerText = "";
         tempModel = [];
+        crosshair = [];
         modeSquare = 0;
     }
 }
@@ -69,12 +75,15 @@ rectangleMode = () => {
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        canvasLabel.innerText = "Drawing rectangle";
         tempModel = [];
         modeRectangle = 1;
         console.log(`Drawing rectangle`);
     } else if (modeRectangle == 1 || modeRectangle == 2) {
         btn_rectangle.classList.remove("button-shape-selected");
+        canvasLabel.innerText = "";
         tempModel = [];
+        crosshair = [];
         modeRectangle = 0;
     }
 }
@@ -86,12 +95,15 @@ polygonMode = () => {
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
+        canvasLabel.innerText = "Drawing polygon";
         tempModel = [];
         modePolygon = 1;
         console.log(`Drawing polygon`);
     } else {
         btn_polygon.classList.remove("button-shape-selected");
+        canvasLabel.innerText = "";
         tempModel = [];
+        crosshair = [];
         modePolygon = 0;
     }
 }

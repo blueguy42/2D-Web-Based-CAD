@@ -109,6 +109,11 @@ if (!gl) {
         guide.render();
       });
     }
+
+    crosshair.forEach(cross => {
+      console.log(cross);
+      cross.render();
+    });
     
     window.requestAnimationFrame(render);
   }
