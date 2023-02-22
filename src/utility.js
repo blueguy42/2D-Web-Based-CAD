@@ -110,6 +110,7 @@ lineMode = () => {
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        btn_convex.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing line";
         tempModel = [];
         modeLine = 1;
@@ -130,6 +131,7 @@ squareMode = () => {
         btn_line.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        btn_convex.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing square";
         tempModel = [];
         modeSquare = 1;
@@ -150,6 +152,7 @@ rectangleMode = () => {
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        btn_convex.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing rectangle";
         tempModel = [];
         modeRectangle = 1;
