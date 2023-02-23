@@ -63,6 +63,7 @@ canvas.addEventListener('mouseup', function(e) {
 canvas.addEventListener('mousemove', function(e) {
     crosshair = [];
     let coordinate = getCanvasCoordinate(e);
+    canvas.style.cursor = "default";
     canvasLabel.innerText = "";
     if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner != 0) {
         if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner == 2) {
@@ -73,8 +74,6 @@ canvas.addEventListener('mousemove', function(e) {
             crosshairY.setLine(new Coordinate([coordinate[0], 0]), new Color("#777777"), new Coordinate([coordinate[0], canvas.clientHeight]), new Color("#777777"));
             crosshair.push(crosshairX);
             crosshair.push(crosshairY);
-        } else {
-            canvas.style.cursor = "default";
         }
         if (modeLine != 0) {
             canvasLabel.innerText += "Drawing line";
