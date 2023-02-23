@@ -61,10 +61,21 @@ canvas.addEventListener('mouseup', function(e) {
 })
 
 canvas.addEventListener('mousemove', function(e) {
+    crosshair = [];
     let coordinate = getCanvasCoordinate(e);
     canvasLabel.innerText = "";
-    if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0) {
-        canvas.style.cursor = "crosshair";
+    if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner != 0) {
+        if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner == 2) {
+            canvas.style.cursor = "crosshair";
+            let crosshairX = new Line(crosshair.length);
+            crosshairX.setLine(new Coordinate([0, coordinate[1]]), new Color("#777777"), new Coordinate([canvas.clientWidth, coordinate[1]]), new Color("#777777"));
+            let crosshairY = new Line(crosshair.length);
+            crosshairY.setLine(new Coordinate([coordinate[0], 0]), new Color("#777777"), new Coordinate([coordinate[0], canvas.clientHeight]), new Color("#777777"));
+            crosshair.push(crosshairX);
+            crosshair.push(crosshairY);
+        } else {
+            canvas.style.cursor = "default";
+        }
         if (modeLine != 0) {
             canvasLabel.innerText += "Drawing line";
         } else if (modeSquare != 0) {
@@ -83,16 +94,6 @@ canvas.addEventListener('mousemove', function(e) {
             canvasLabel.innerText += "Moving corner";
         }
         canvasLabel.innerText += "\n";
-
-        crosshair = [];
-        let crosshairX = new Line(crosshair.length);
-        crosshairX.setLine(new Coordinate([0, coordinate[1]]), new Color("#777777"), new Coordinate([canvas.clientWidth, coordinate[1]]), new Color("#777777"));
-        let crosshairY = new Line(crosshair.length);
-        crosshairY.setLine(new Coordinate([coordinate[0], 0]), new Color("#777777"), new Coordinate([coordinate[0], canvas.clientHeight]), new Color("#777777"));
-        crosshair.push(crosshairX);
-        crosshair.push(crosshairY);
-    } else {
-        canvas.style.cursor = "default";
     }
     if (modeLine == 2) {
         tempModel[0].setLine(tempModel[0].vertices[0].coordinate, tempModel[0].vertices[0].color, new Coordinate(coordinate), new Color(chosenColor));
@@ -114,7 +115,6 @@ canvas.addEventListener('mousemove', function(e) {
                 moveMousePos = [];
             }
         } else if (modeMoveCorner == 2) {
-            canvas.style.cursor = "crosshair";
             setNearCornersCoordinate(models, moveMousePos, coordinate, moveCorners);
         }
     }
@@ -191,6 +191,8 @@ canvas.addEventListener('mouseleave', function(e) {
             canvasLabel.innerText += "\nNon-convex mode";
         }
         canvasLabel.innerText += "\nDOUBLE CLICK to finish";
+    } else if (modeMoveCorner != 0) {
+        canvasLabel.innerText = "Moving corner";
     } else {
         canvasLabel.innerText = "";
     }
