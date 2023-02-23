@@ -10,6 +10,8 @@ const btn_coor = document.getElementById('btn-coor');
 const btn_convex = document.getElementById('btn-convex');
 const btn_save = document.getElementById('btn-save');
 const btn_load = document.getElementById('btn-load');
+const btn_clear = document.getElementById('btn-clear');
+const btn_randomcolor = document.getElementById('btn-random-color');
 
 var chosenColor = getRandomColor();
 
@@ -25,7 +27,8 @@ var modeCoordinate = 0;
 var modeConvex = 0;
 
 colorWheel.value = chosenColor;
-colorLabel.innerText = chosenColor
+colorWheel.style.backgroundColor = chosenColor;
+colorLabel.innerText = chosenColor;
 
 colorWheel.addEventListener('change', function(e) {
     chosenColor = e.target.value;
@@ -51,6 +54,7 @@ canvas.addEventListener('mousemove', function(e) {
             } else {
                 canvasLabel.innerText += "\nNon-convex mode";
             }
+            canvasLabel.innerText += "\nDOUBLE CLICK to finish";
         }
         canvasLabel.innerText += "\n";
 
@@ -146,6 +150,7 @@ canvas.addEventListener('mouseleave', function(e) {
         } else {
             canvasLabel.innerText += "\nNon-convex mode";
         }
+        canvasLabel.innerText += "\nDouble-click to finish";
     } else {
         canvasLabel.innerText = "";
     }
@@ -160,6 +165,29 @@ btn_coor.addEventListener('click', function(e) {coordinateMode()})
 btn_convex.addEventListener('click', function(e) {convexMode()})
 btn_save.addEventListener('click', function(e) {saveModel()})
 btn_load.addEventListener('click', function(e) {loadModel()})
+btn_clear.addEventListener('click', function(e) {clearModel()})
+btn_randomcolor.addEventListener('click', function(e) {randomColor()})
+
+btn_line.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Draw line";
+})
+
+btn_square.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Draw square";
+})
+
+btn_rectangle.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Draw rectangle";
+})
+
+btn_polygon.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Draw polygon";
+    if (modeConvex == 1) {
+        canvasLabel.innerText += "\nConvex mode";
+    } else {
+        canvasLabel.innerText += "\nNon-convex mode";
+    }
+})
 
 btn_coor.addEventListener('mouseover', function(e) {
     if (modeCoordinate == 0) {
@@ -177,6 +205,38 @@ btn_convex.addEventListener('mouseover', function(e) {
     }
 })
 
+btn_save.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Save model";
+})
+
+btn_load.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Load model";
+})
+
+btn_clear.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Clear canvas";
+})
+
+btn_randomcolor.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Randomize color";
+})
+
+btn_line.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_square.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_rectangle.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_polygon.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
 btn_coor.addEventListener('mouseleave', function(e) {
     canvasLabel.innerText = "";
 })
@@ -185,18 +245,43 @@ btn_convex.addEventListener('mouseleave', function(e) {
     canvasLabel.innerText = "";
 })
 
+btn_save.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_load.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_clear.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_randomcolor.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
 document.addEventListener('keyup', function(e) {
-    if (e.key == "q") {
+    let key = e.key.toLowerCase();
+    if (key == "a") {
         lineMode();
-    } else if (e.key == "w") {
+    } else if (key == "s") {
         squareMode();
-    } else if (e.key == "e") {
+    } else if (key == "d") {
         rectangleMode();
-    } else if (e.key == "r") {
+    } else if (key == "f") {
         polygonMode();
-    } else if (e.key == "v") {
+    } else if (key == "q") {
         coordinateMode();
-    } else if (e.key == "t") {
+    } else if (key == "g") {
         convexMode();
+    } else if (key == "e") {
+        saveModel();
+    } else if (key == "r") {
+        loadModel();
+    } else if (key == "t") {
+        clearModel();
+    } else if (key == "w") {
+        randomColor();
     }
 })

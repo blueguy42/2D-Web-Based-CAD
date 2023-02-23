@@ -28,11 +28,11 @@ div#sidebar {
   gap: 15px;
 }
 
-div#file {
+div.sidebar-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 15px;
+  gap: 8px;
 }
 
 canvas {
@@ -63,7 +63,7 @@ div#wrapper {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
 
 .button-shape {
@@ -72,6 +72,7 @@ div#wrapper {
   padding: 10px 30px;
   margin: 8px 0;
   border: 1px solid;
+  border-color: #d2d2d2;
   border-radius: 15px;
   transition-duration: 300ms;
 }
@@ -98,6 +99,20 @@ div#wrapper {
   transition-duration: 300ms;
 }
 
+.button-shape-sub{
+  background-color: #f0a400;
+  color: white;
+  border-color: #f0a400;
+  transition-duration: 300ms;
+}
+
+.button-shape-sub:hover{
+  background-color: #f7b934;
+  color: white;
+  border-color: #f7b934;
+  transition-duration: 300ms;
+}
+
 button.btn-coor-webgl{
   background-color: #4328da;
   color: white;
@@ -105,10 +120,24 @@ button.btn-coor-webgl{
   transition-duration: 300ms;
 }
 
+button.btn-coor-webgl:hover{
+  background-color: #5e46e1;
+  color: white;
+  border-color: #5e46e1;
+  transition-duration: 300ms;
+}
+
 button.btn-coor-canvas{
   background-color: #f54332;
   color: white;
   border-color: #f54332;
+  transition-duration: 300ms;
+}
+
+button.btn-coor-canvas:hover{
+  background-color: #f77a2c;
+  color: white;
+  border-color: #f77a2c;
   transition-duration: 300ms;
 }
 

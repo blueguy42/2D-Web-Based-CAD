@@ -94,7 +94,7 @@ getGuidesofArr = (arr) => {
 }
 
 getRandomColor = () => {
-    let letters = '0123456789abcdef';
+    let letters = '0123456789ABCDEF';
     let color = '#';
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
@@ -180,6 +180,7 @@ polygonMode = () => {
         } else {
             canvasLabel.innerText += "\nNon-convex mode";
         }
+        canvasLabel.innerText += "\nDouble-click to finish";
         tempModel = [];
         modePolygon = 1;
         console.log(`Drawing polygon`);
@@ -197,14 +198,14 @@ coordinateMode = () => {
     if (modeCoordinate == 0) {
         btn_coor.classList.remove("btn-coor-webgl");
         btn_coor.classList.add("btn-coor-canvas");
-        btn_coor.innerText = "Canvas Coordinate"
+        btn_coor.innerText = "Canvas Coordinate [Q]"
         canvasLabel.innerText = "Switched display to canvas coordinate";
         modeCoordinate = 1;
         console.log(`Switched display to canvas coordinate`);
     } else {
         btn_coor.classList.remove("btn-coor-canvas");
         btn_coor.classList.add("btn-coor-webgl");
-        btn_coor.innerText = "WebGL Coordinate"
+        btn_coor.innerText = "WebGL Coordinate [Q]"
         canvasLabel.innerText = "Switched display to WebGL coordinate";
         modeCoordinate = 0;
         console.log(`Switched display to WebGL coordinate`);
@@ -214,14 +215,14 @@ coordinateMode = () => {
 convexMode = () => {
     if (modePolygon != 0) {
         if (modeConvex == 0) {
-            btn_convex.classList.add("button-shape-selected");
+            btn_convex.classList.add("button-shape-sub");
             canvasLabel.innerText = "Switched to convex polygon drawing";
             tempModel = [];
             modeConvex = 1;
             modePolygon = 1;
             console.log(`Convex Hull`);
         } else {
-            btn_convex.classList.remove("button-shape-selected");
+            btn_convex.classList.remove("button-shape-sub");
             canvasLabel.innerText = "Switched to non-convex polygon drawing";
             tempModel = [];
             crosshair = [];
@@ -240,26 +241,32 @@ saveFile = (filename, content) => {
 
 saveModel = () => {
     console.log(models);
-    const savedModels = JSON.parse(JSON.stringify(models));
-    savedModels.forEach(model => {
-        model.vertices.forEach(vertex => {
-            vertex.coordinate.x = getCanvastoWebGL_X(canvas,vertex.coordinate.x);
-            vertex.coordinate.y = getCanvastoWebGL_Y(canvas,vertex.coordinate.y);
-        })
-        model.guides.forEach(guide => {
-            guide.vertices.forEach(vertex => {
+    if (models.length == 0) {
+        canvasLabel.innerText = "No model to save";
+    } else {
+        const savedModels = JSON.parse(JSON.stringify(models));
+        savedModels.forEach(model => {
+            model.vertices.forEach(vertex => {
                 vertex.coordinate.x = getCanvastoWebGL_X(canvas,vertex.coordinate.x);
                 vertex.coordinate.y = getCanvastoWebGL_Y(canvas,vertex.coordinate.y);
             })
+            model.guides.forEach(guide => {
+                guide.vertices.forEach(vertex => {
+                    vertex.coordinate.x = getCanvastoWebGL_X(canvas,vertex.coordinate.x);
+                    vertex.coordinate.y = getCanvastoWebGL_Y(canvas,vertex.coordinate.y);
+                })
+            })
         })
-    })
-    saveFile("models.json", JSON.stringify(savedModels));
-    console.log(savedModels);
+        saveFile("models.json", JSON.stringify(savedModels));
+        canvasLabel.innerText = "Saved model";
+        console.log(savedModels);
+    }
 }
 
 loadModel = () => {
     let input = document.createElement('input');
     input.type = "file";
+    let inputModels = [];
     input.onchange = e => {
         var file = e.target.files[0];
         var reader = new FileReader();
@@ -284,9 +291,42 @@ loadModel = () => {
                 })
                 newModel.copy(model);
                 console.log(JSON.stringify(newModel));
-                models.push(newModel);
+                inputModels.push(newModel);
             });
+
+            if (inputModels.length != 0) {
+                models = models.concat(inputModels);
+                canvasLabel.innerText = "Loaded model";
+            } else {
+                canvasLabel.innerText = "No model to load";
+            }
         }
     }
     input.click();
+}
+
+clearModel = () => {
+    if (models.length == 0) {
+        canvasLabel.innerText = "Canvas is already cleared";
+    } else {
+        models = [];
+        tempModel = [];
+        crosshair = [];
+        canvasLabel.innerText = "Cleared canvas";
+    }
+    modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0;
+    btn_line.classList.remove("button-shape-selected");
+    btn_square.classList.remove("button-shape-selected");
+    btn_rectangle.classList.remove("button-shape-selected");
+    btn_polygon.classList.remove("button-shape-selected");
+    btn_convex.style.visibility = 'hidden';
+}
+
+randomColor = () => {
+    let color = getRandomColor();
+    colorWheel.value = color;
+    colorWheel.style.backgroundColor = color;
+    colorLabel.innerText = color;
+    chosenColor = color;
+    canvasLabel.innerText = "Random color generated: " + color;
 }

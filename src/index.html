@@ -12,22 +12,26 @@
       <p id="canvas-label" unselectable="on" ></p>
       <canvas id="glcanvas" width="1000" height="500">Your browser does not support WebGL</canvas>
       <div id="sidebar">
-        <div id="file">
-          <button class="button-shape" id="btn-save" type="button">Save</button>
-          <button class="button-shape" id="btn-load" type="button">Load</button>
+        <div class="sidebar-item" id="color">
+          <button class="button-shape" id="btn-random-color" type="button">Randomize [W]</button>
+          <input type="color" id="color-wheel" name="color-wheel">
+          <p id="color-label"></p>
+        </div>
+        <div class="sidebar-item" id="file">
+          <button class="button-shape" id="btn-save" type="button">Save [E]</button>
+          <button class="button-shape" id="btn-load" type="button">Load [R]</button>
+          <button class="button-shape" id="btn-clear" type="button">Clear [T]</button>
         </div>
       </div>
     </div>
     <div id="div-btn-card">
       <div id="wrapper">
-        <button class="button-shape" id="btn-line" type="button">Line</button>
-        <button class="button-shape" id="btn-square" type="button">Square</button>
-        <button class="button-shape" id="btn-rectangle" type="button">Rectangle</button>
-        <button class="button-shape" id="btn-polygon" type="button">Polygon</button>
-        <button class="button-shape" style="visibility: hidden" id="btn-convex" type="button">Convex Hull</button>
-        <button class="button-shape btn-coor-webgl" id="btn-coor" type="button">WebGL Coordinate</button>
-        <input type="color" id="color-wheel" name="color-wheel">
-        <p id="color-label"></p>
+        <button class="button-shape btn-coor-webgl" id="btn-coor" type="button"key>WebGL Coordinate [Q]</button>
+        <button class="button-shape" id="btn-line" type="button"key>Line [A]</button>
+        <button class="button-shape" id="btn-square" type="button"key>Square [S]</button>
+        <button class="button-shape" id="btn-rectangle" type="button"key>Rectangle [D]</button>
+        <button class="button-shape" id="btn-polygon" type="button"key>Polygon [F]</button>
+        <button class="button-shape" style="visibility: hidden" id="btn-convex" type="button"key>Convex Hull [G]</button>
       </div>
     </div>
     </div>
