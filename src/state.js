@@ -12,6 +12,7 @@ const btn_save = document.getElementById('btn-save');
 const btn_load = document.getElementById('btn-load');
 const btn_clear = document.getElementById('btn-clear');
 const btn_randomcolor = document.getElementById('btn-random-color');
+const btn_movecorner = document.getElementById('btn-move-corner');
 
 var chosenColor = getRandomColor();
 
@@ -25,6 +26,11 @@ var modeRectangle = 0;
 var modePolygon = 0;
 var modeCoordinate = 0;
 var modeConvex = 0;
+var modeMoveCorner = 0;
+
+var moveCorners = [];
+var moveMousePos = [];
+var moveIsEdgeExist = false;
 
 colorWheel.value = chosenColor;
 colorWheel.style.backgroundColor = chosenColor;
@@ -34,6 +40,24 @@ colorWheel.addEventListener('change', function(e) {
     chosenColor = e.target.value;
     colorLabel.innerText = e.target.value;
     console.log(`Color wheel: ${chosenColor}`);
+})
+
+canvas.addEventListener('mousedown', function(e) {
+    let coordinate = getCanvasCoordinate(e);
+    if (modeMoveCorner == 1 && moveIsEdgeExist) {
+        moveCorners = getNearCornersId(models, coordinate);
+        moveMousePos = coordinate;
+        modeMoveCorner = 2;
+    }
+})
+
+canvas.addEventListener('mouseup', function(e) {
+    if (modeMoveCorner == 2) {
+        modeMoveCorner = 1;
+        moveCorners = [];
+        moveMousePos = [];
+        moveIsEdgeExist = false;
+    }
 })
 
 canvas.addEventListener('mousemove', function(e) {
@@ -55,6 +79,8 @@ canvas.addEventListener('mousemove', function(e) {
                 canvasLabel.innerText += "\nNon-convex mode";
             }
             canvasLabel.innerText += "\nDOUBLE CLICK to finish";
+        } else if (modeMoveCorner != 0) {
+            canvasLabel.innerText += "Moving corner";
         }
         canvasLabel.innerText += "\n";
 
@@ -76,12 +102,26 @@ canvas.addEventListener('mousemove', function(e) {
         tempModel[0].setRectangle(tempModel[0].vertices[0].coordinate, tempModel[0].vertices[0].color, new Coordinate(coordinate), new Color(chosenColor));
     } else if (modePolygon == 2) {
         tempModel[0].setLastCorner(new Coordinate(coordinate), new Color(chosenColor));
+    } else if (modeMoveCorner != 0) {
+        let corners = getNearCornersId(models, coordinate);
+        if (modeMoveCorner == 1) {
+            if (corners.length > 0) {
+                canvas.style.cursor = "all-scroll";
+                moveIsEdgeExist = true;
+            } else {
+                moveIsEdgeExist = false;
+                moveCorners = [];
+                moveMousePos = [];
+            }
+        } else if (modeMoveCorner == 2) {
+            canvas.style.cursor = "crosshair";
+            setNearCornersCoordinate(models, moveMousePos, coordinate, moveCorners);
+        }
     }
     if (modeCoordinate == 0) {
-        canvasLabel.innerText += "x: " + getCanvastoWebGL_X(canvas, coordinate[0]).toFixed(4) + "\ny: " + getCanvastoWebGL_Y(canvas, coordinate[1]).toFixed(4);
+        canvasLabel.innerText += "x: " + getCanvastoWebGL_X(canvas, coordinate[0]).toFixed(5) + "\ny: " + getCanvastoWebGL_Y(canvas, coordinate[1]).toFixed(5);
     } else {
-        canvasLabel.innerText += "x: " + coordinate[0].toFixed(4) + "\ny: " + coordinate[1].toFixed(4);
-
+        canvasLabel.innerText += "x: " + coordinate[0].toFixed(0) + "\ny: " + coordinate[1].toFixed(0);
     }
 })
 
@@ -150,7 +190,7 @@ canvas.addEventListener('mouseleave', function(e) {
         } else {
             canvasLabel.innerText += "\nNon-convex mode";
         }
-        canvasLabel.innerText += "\nDouble-click to finish";
+        canvasLabel.innerText += "\nDOUBLE CLICK to finish";
     } else {
         canvasLabel.innerText = "";
     }
@@ -167,6 +207,7 @@ btn_save.addEventListener('click', function(e) {saveModel()})
 btn_load.addEventListener('click', function(e) {loadModel()})
 btn_clear.addEventListener('click', function(e) {clearModel()})
 btn_randomcolor.addEventListener('click', function(e) {randomColor()})
+btn_movecorner.addEventListener('click', function(e) {moveCorner()})
 
 btn_line.addEventListener('mouseover', function(e) {
     canvasLabel.innerText = "Draw line";
@@ -221,6 +262,10 @@ btn_randomcolor.addEventListener('mouseover', function(e) {
     canvasLabel.innerText = "Randomize color";
 })
 
+btn_movecorner.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Move corner";
+})
+
 btn_line.addEventListener('mouseleave', function(e) {
     canvasLabel.innerText = "";
 })
@@ -261,6 +306,10 @@ btn_randomcolor.addEventListener('mouseleave', function(e) {
     canvasLabel.innerText = "";
 })
 
+btn_movecorner.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
 document.addEventListener('keyup', function(e) {
     let key = e.key.toLowerCase();
     if (key == "a") {
@@ -283,5 +332,7 @@ document.addEventListener('keyup', function(e) {
         clearModel();
     } else if (key == "w") {
         randomColor();
+    } else if (key == "z") {
+        moveCorner();
     }
 })

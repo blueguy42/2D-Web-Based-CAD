@@ -46,6 +46,90 @@ euclideanDistance = (x1, y1, x2, y2) => {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
+differenceXY = (x1, y1, x2, y2) => {
+    return [x2 - x1, y2 - y1];
+}
+
+getModelId = (modelArr, modelId) => {
+    for (let i = 0; i < modelArr.length; i++) {
+        if (modelArr[i].id == modelId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+getVertexId = (model, vertexId) => {
+    for (let i = 0; i < model.vertices.length; i++) {
+        if (model.vertices[i].id == vertexId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+getNearCornersId = (modelArr, [x, y], type="all") => {
+    // returns [model id, vertex id, x, y]
+    let result = [];
+    let modelIndex = -1;
+    let vertexIndex = -1;
+    modelArr.forEach(model => {
+        modelIndex++;
+        vertexIndex = -1;
+        if (model.type == type || type == "all") {
+            model.vertices.forEach(vertex => {
+                vertexIndex++;
+                if (euclideanDistance(x, y, vertex.coordinate.x, vertex.coordinate.y) <= 6) {
+                    if (model.type == "polygon" && model.convex == true && model.vertices.length > 2) {
+                        result.push([modelIndex, vertexIndex, vertex.coordinate.x, vertex.coordinate.y, [model.type, model.convex]]);
+                    } else {
+                        result.push([modelIndex, vertexIndex, vertex.coordinate.x, vertex.coordinate.y, [model.type, 0]]);
+                    }
+                }
+            });
+        }
+    });
+    return result;
+}
+
+setNearCornersCoordinate = (modelArr, [startX, startY], [endX, endY], nearcorners) => {
+    // sets corner vertex and guide from getNearCorners to new coordinate in relation to mouse position
+    let corner0 = nearcorners[0];
+    let changeableCorners = nearcorners.filter(corner => corner[0] == corner0[0]);
+    for (let i = 0; i < changeableCorners.length; i++) {
+        let nearcorner = changeableCorners[i];
+        // check if corner is part of a convex polygon and is the second or last vertex. If not convex polygon corner is first vertex of changeable corners
+        if ((nearcorner[4][0] == "polygon" && nearcorner[4][1] && [1, modelArr[nearcorner[0]].vertices.length-1].includes(nearcorner[1])) || i == 0) {
+            let model = modelArr[nearcorner[0]];
+            let vertex = model.vertices[nearcorner[1]];
+            vertex.coordinate.x = endX - startX + nearcorner[2];
+            vertex.coordinate.y = endY - startY + nearcorner[3];
+            let newGuide = new Guide(nearcorner[1]);
+            newGuide.setGuide(new Coordinate([vertex.coordinate.x, vertex.coordinate.y]));
+            model.guides[nearcorner[1]] = newGuide;
+        }
+    }
+}
+
+setNearCornersColor = (modelArr, nearcorners, newColor) => {
+    // sets corner vertex color from getNearCorners
+    let nearcorner = nearcorners[0];
+    let model = modelArr[nearcorner[0]];
+    let vertex = model.vertices[nearcorner[1]];
+    vertex.color = newColor;
+
+    let corner0 = nearcorners[0];
+    let changeableCorners = nearcorners.filter(corner => corner[0] == corner0[0]);
+    for (let i = 0; i < changeableCorners.length; i++) {
+        let nearcorner = changeableCorners[i];
+        if ((nearcorner[4][0] == "polygon" && nearcorner[4][1] && [1, modelArr[nearcorner[0]].vertices.length].includes(nearcorner[1])) || i == 0) {
+            let model = modelArr[nearcorner[0]];
+            let vertex = model.vertices[nearcorner[1]];
+            vertex.color = newColor;
+        }
+    }
+}
+    
 // Monotone chain
 cross = (point1, point2, point3) => (point1.coordinate.x - point3.coordinate.x) * (point2.coordinate.y - point3.coordinate.y) - (point1.coordinate.y - point3.coordinate.y) * (point2.coordinate.x - point3.coordinate.x);
 
@@ -104,12 +188,13 @@ getRandomColor = () => {
   
 
 lineMode = () => {
-    if (modeLine == 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0) {
-        modeSquare = 0; modeRectangle = 0; modePolygon = 0;
+    if (modeLine == 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner != 0) {
+        modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0;
         btn_line.classList.add("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        btn_movecorner.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing line";
         tempModel = [];
@@ -125,12 +210,13 @@ lineMode = () => {
 }
 
 squareMode = () => {
-    if (modeSquare == 0 || modeLine != 0 || modeRectangle != 0 || modePolygon != 0) {
-        modeLine = 0; modeRectangle = 0; modePolygon = 0;
+    if (modeSquare == 0 || modeLine != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner != 0) {
+        modeLine = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0;
         btn_square.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        btn_movecorner.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing square";
         tempModel = [];
@@ -146,12 +232,13 @@ squareMode = () => {
 }
 
 rectangleMode = () => {
-    if (modeRectangle == 0 || modeLine != 0 || modeSquare != 0 || modePolygon != 0) {
-        modeLine = 0; modeSquare = 0; modePolygon = 0;
+    if (modeRectangle == 0 || modeLine != 0 || modeSquare != 0 || modePolygon != 0 || modeMoveCorner != 0) {
+        modeLine = 0; modeSquare = 0; modePolygon = 0; modeMoveCorner = 0;
         btn_rectangle.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        btn_movecorner.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing rectangle";
         tempModel = [];
@@ -167,12 +254,13 @@ rectangleMode = () => {
 }
 
 polygonMode = () => {
-    if (modePolygon == 0 || modeLine != 0 || modeSquare != 0 || modeRectangle != 0) {
-        modeLine = 0; modeSquare = 0; modeRectangle = 0;
+    if (modePolygon == 0 || modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modeMoveCorner != 0) {
+        modeLine = 0; modeSquare = 0; modeRectangle = 0; modeMoveCorner = 0;
         btn_polygon.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
+        btn_movecorner.classList.remove("btn-purple");
         btn_convex.style.visibility='visible'
         canvasLabel.innerText = "Drawing polygon";
         if (modeConvex == 1) {
@@ -180,7 +268,7 @@ polygonMode = () => {
         } else {
             canvasLabel.innerText += "\nNon-convex mode";
         }
-        canvasLabel.innerText += "\nDouble-click to finish";
+        canvasLabel.innerText += "\nDOUBLE CLICK to finish";
         tempModel = [];
         modePolygon = 1;
         console.log(`Drawing polygon`);
@@ -196,15 +284,15 @@ polygonMode = () => {
 
 coordinateMode = () => {
     if (modeCoordinate == 0) {
-        btn_coor.classList.remove("btn-coor-webgl");
-        btn_coor.classList.add("btn-coor-canvas");
+        btn_coor.classList.remove("btn-purplel");
+        btn_coor.classList.add("btn-red");
         btn_coor.innerText = "Canvas Coordinate [Q]"
         canvasLabel.innerText = "Switched display to canvas coordinate";
         modeCoordinate = 1;
         console.log(`Switched display to canvas coordinate`);
     } else {
-        btn_coor.classList.remove("btn-coor-canvas");
-        btn_coor.classList.add("btn-coor-webgl");
+        btn_coor.classList.remove("btn-red");
+        btn_coor.classList.add("btn-purple");
         btn_coor.innerText = "WebGL Coordinate [Q]"
         canvasLabel.innerText = "Switched display to WebGL coordinate";
         modeCoordinate = 0;
@@ -309,16 +397,17 @@ clearModel = () => {
     if (models.length == 0) {
         canvasLabel.innerText = "Canvas is already cleared";
     } else {
-        models = [];
-        tempModel = [];
-        crosshair = [];
         canvasLabel.innerText = "Cleared canvas";
     }
+    models = [];
+    tempModel = [];
+    crosshair = [];
     modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0;
     btn_line.classList.remove("button-shape-selected");
     btn_square.classList.remove("button-shape-selected");
     btn_rectangle.classList.remove("button-shape-selected");
     btn_polygon.classList.remove("button-shape-selected");
+    btn_movecorner.classList.remove("btn-purple");
     btn_convex.style.visibility = 'hidden';
 }
 
@@ -329,4 +418,25 @@ randomColor = () => {
     colorLabel.innerText = color;
     chosenColor = color;
     canvasLabel.innerText = "Random color generated: " + color;
+}
+
+moveCorner = () => {
+    if (modeMoveCorner == 0 || modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0) {
+        modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0;
+        btn_line.classList.remove("button-shape-selected");
+        btn_square.classList.remove("button-shape-selected");
+        btn_rectangle.classList.remove("button-shape-selected");
+        btn_polygon.classList.remove("button-shape-selected");
+        btn_movecorner.classList.add("btn-purple");
+        canvasLabel.innerText = "Moving corner";
+        btn_convex.style.visibility = 'hidden';
+        tempModel = [];
+        crosshair = [];
+        modeMoveCorner = 1;
+        console.log(`Moving corner`);
+    } else if (modeMoveCorner == 1) {
+        btn_movecorner.classList.remove("btn-purple");
+        canvasLabel.innerText = "";
+        modeMoveCorner = 0;
+    }
 }

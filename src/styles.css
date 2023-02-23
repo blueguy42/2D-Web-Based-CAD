@@ -113,28 +113,28 @@ div#wrapper {
   transition-duration: 300ms;
 }
 
-button.btn-coor-webgl{
+button.btn-purple{
   background-color: #4328da;
   color: white;
   border-color: #4328da;
   transition-duration: 300ms;
 }
 
-button.btn-coor-webgl:hover{
+button.btn-purple:hover{
   background-color: #5e46e1;
   color: white;
   border-color: #5e46e1;
   transition-duration: 300ms;
 }
 
-button.btn-coor-canvas{
+button.btn-red{
   background-color: #f54332;
   color: white;
   border-color: #f54332;
   transition-duration: 300ms;
 }
 
-button.btn-coor-canvas:hover{
+button.btn-red:hover{
   background-color: #f77a2c;
   color: white;
   border-color: #f77a2c;

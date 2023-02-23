@@ -327,7 +327,7 @@ class Polygon extends Model {
 
   addCorner = (coordinate1, color1) => {
     this.addVertex(coordinate1, color1);
-    let guide1 = new Guide(this.vertices.length);
+    let guide1 = new Guide(this.vertices.length-1);
     guide1.setGuide(coordinate1);
     this.guides.push(guide1);
   }
@@ -341,17 +341,22 @@ class Polygon extends Model {
   makePolygon = () => {
     this.vertices = this.vertices.slice(0, -3);
     this.guides = this.guides.slice(0, -3);
-    if (this.convex) {
+    this.makeConvexHull();
+    
+  }
+
+  makeConvexHull = () => {
+    if (this.convex && this.vertices.length > 2) {
       let outsideVert = convexHull(this.vertices);
       outsideVert = sortAntiClockwise(outsideVert);
       this.vertices = [new Point(new Coordinate(getCenter(outsideVert)), this.vertices[0].color)].concat(outsideVert);
-    this.addCorner(this.vertices[1].coordinate, this.vertices[1].color);
-    this.guides = [];
-    this.vertices.forEach((vertex) => {
-      let guide1 = new Guide(this.guides.length);
-      guide1.setGuide(vertex.coordinate);
-      this.guides.push(guide1);
-    });
+      this.addCorner(this.vertices[1].coordinate, this.vertices[1].color);
+      this.guides = [];
+      this.vertices.forEach((vertex) => {
+        let guide1 = new Guide(this.guides.length);
+        guide1.setGuide(vertex.coordinate);
+        this.guides.push(guide1);
+      });
     }
   }
 
@@ -369,18 +374,6 @@ class Polygon extends Model {
     let buff = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buff);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(polygonVertices), gl.STATIC_DRAW);
-
-    let indices = [];
-    if (this.vertices.length > 2) {
-      for (let i = 0; i < this.vertices.length-2; i++) {
-        indices.push(i);
-        indices.push(i+1);
-        indices.push(i+2);
-      }
-      let indexBufer = gl.createBuffer();
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBufer);
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-    }
 
     let positionAttribLocation = gl.getAttribLocation(program, 'vertPosition');
     let colorAttribLocation = gl.getAttribLocation(program, 'vertColor');
@@ -410,7 +403,7 @@ class Polygon extends Model {
     } else if (this.vertices.length == 2) {
       gl.drawArrays(gl.LINES, 0, this.vertices.length);
     } else {
-        gl.drawArrays(gl.TRIANGLE_FAN, 0, this.vertices.length);
+      gl.drawArrays(gl.TRIANGLE_FAN, 0, this.vertices.length);
     }
   }
 }
