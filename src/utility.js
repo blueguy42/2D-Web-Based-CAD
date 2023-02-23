@@ -405,13 +405,13 @@ loadModel = () => {
             loadedModels.forEach(model => {
                 let newModel;
                 if(model.type == "line") {
-                    newModel = new Line(models.length);
+                    newModel = new Line(models.length+inputModels.length);
                 } else if(model.type == "square") {
-                    newModel = new Square(models.length);
+                    newModel = new Square(models.length+inputModels.length);
                 } else if(model.type == "rectangle") {
-                    newModel = new Rectangle(models.length);
+                    newModel = new Rectangle(models.length+inputModels.length);
                 } else if(model.type == "polygon") {
-                    newModel = new Polygon(models.length,model.convex);
+                    newModel = new Polygon(models.length+inputModels.length,model.convex);
                 }
                 model.vertices.forEach(vertex => {
                     vertex.coordinate.x = getWebGLtoCanvas_X(canvas,vertex.coordinate.x);
