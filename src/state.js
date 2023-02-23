@@ -8,6 +8,8 @@ const btn_rectangle = document.getElementById('btn-rectangle');
 const btn_polygon = document.getElementById('btn-polygon');
 const btn_coor = document.getElementById('btn-coor');
 const btn_convex = document.getElementById('btn-convex');
+const btn_save = document.getElementById('btn-save');
+const btn_load = document.getElementById('btn-load');
 
 var chosenColor = getRandomColor();
 
@@ -156,6 +158,8 @@ btn_rectangle.addEventListener('click', function(e) {rectangleMode()})
 btn_polygon.addEventListener('click', function(e) {polygonMode()})
 btn_coor.addEventListener('click', function(e) {coordinateMode()})
 btn_convex.addEventListener('click', function(e) {convexMode()})
+btn_save.addEventListener('click', function(e) {saveModel()})
+btn_load.addEventListener('click', function(e) {loadModel()})
 
 btn_coor.addEventListener('mouseover', function(e) {
     if (modeCoordinate == 0) {

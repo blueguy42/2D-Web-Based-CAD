@@ -33,6 +33,17 @@ class Model {
   }
 
   getVertexCount = () => this.vertices.length;
+
+  copy = (other) => {
+    this.vertices = [];
+    this.guides = [];
+    other.vertices.forEach((vertex) => {
+      this.addVertex(vertex.coordinate, vertex.color);
+      let guide = new Guide(this.guides.length);
+      guide.setGuide(vertex.coordinate);
+      this.guides.push(guide);
+    })
+  }
 }
 
 class Line extends Model {

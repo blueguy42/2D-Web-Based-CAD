@@ -230,3 +230,63 @@ convexMode = () => {
         }
     }
 }
+
+saveFile = (filename, content) => {
+    const anchor = document.createElement('a');
+    anchor.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+    anchor.setAttribute('download', filename);
+    anchor.click();
+}
+
+saveModel = () => {
+    console.log(models);
+    const savedModels = JSON.parse(JSON.stringify(models));
+    savedModels.forEach(model => {
+        model.vertices.forEach(vertex => {
+            vertex.coordinate.x = getCanvastoWebGL_X(canvas,vertex.coordinate.x);
+            vertex.coordinate.y = getCanvastoWebGL_Y(canvas,vertex.coordinate.y);
+        })
+        model.guides.forEach(guide => {
+            guide.vertices.forEach(vertex => {
+                vertex.coordinate.x = getCanvastoWebGL_X(canvas,vertex.coordinate.x);
+                vertex.coordinate.y = getCanvastoWebGL_Y(canvas,vertex.coordinate.y);
+            })
+        })
+    })
+    saveFile("models.json", JSON.stringify(savedModels));
+    console.log(savedModels);
+}
+
+loadModel = () => {
+    let input = document.createElement('input');
+    input.type = "file";
+    input.onchange = e => {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file, "UTF-8");
+        reader.onload = readerEvent => {
+            var content = readerEvent.target.result;
+            var loadedModels = JSON.parse(content);
+            loadedModels.forEach(model => {
+                let newModel;
+                if(model.type == "line") {
+                    newModel = new Line(models.length);
+                } else if(model.type == "square") {
+                    newModel = new Square(models.length);
+                } else if(model.type == "rectangle") {
+                    newModel = new Rectangle(models.length);
+                } else if(model.type == "polygon") {
+                    newModel = new Polygon(models.length,model.convex);
+                }
+                model.vertices.forEach(vertex => {
+                    vertex.coordinate.x = getWebGLtoCanvas_X(canvas,vertex.coordinate.x);
+                    vertex.coordinate.y = getWebGLtoCanvas_Y(canvas,vertex.coordinate.y);
+                })
+                newModel.copy(model);
+                console.log(JSON.stringify(newModel));
+                models.push(newModel);
+            });
+        }
+    }
+    input.click();
+}
