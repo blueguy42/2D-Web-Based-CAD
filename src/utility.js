@@ -32,6 +32,20 @@ getCenter = (vertices) => {
     return [x / vertices.length, y / vertices.length];
 }
 
+getCenterPoint = (vertices) => {
+    let x = 0;
+    let y = 0;
+    vertices.forEach(vertex => {
+        x += vertex.coordinate.x;
+        y += vertex.coordinate.y;
+    });
+    let centerColor = new Color();
+    centerColor.r = vertices[0].color.r;
+    centerColor.g = vertices[0].color.g;
+    centerColor.b = vertices[0].color.b;
+    return new Point(new Coordinate([x / vertices.length, y / vertices.length]), centerColor);
+}
+
 sortAntiClockwise = (vertices) => {
     let center = getCenter(vertices);
     vertices.sort((vertex1, vertex2) => {
@@ -39,7 +53,7 @@ sortAntiClockwise = (vertices) => {
         let angle2 = Math.atan2(vertex2.coordinate.y - center[1], vertex2.coordinate.x - center[0]);
         return angle1 - angle2;
     });
-    return vertices;
+    // return vertices;
 }
 
 euclideanDistance = (x1, y1, x2, y2) => {
@@ -66,6 +80,23 @@ getVertexId = (model, vertexId) => {
         }
     }
     return -1;
+}
+
+getNearPoint = ([x,y]) => {
+    let result = [null,-1];
+    for(let i = models.length-1;i>=0;i--) {
+        if(euclideanDistance(x,y, models[i].center.coordinate.x, models[i].center.coordinate.y) <= 6) {
+            result = [models[i], -1];
+            break;
+        }
+        for(let j = models[i].vertices.length-1;j>=0;j--) {
+            if(euclideanDistance(x,y, models[i].vertices[j].coordinate.x, models[i].vertices[j].coordinate.y) <= 6) {
+                result = [models[i], j];
+                break;
+            }
+        }
+    }
+    return result;
 }
 
 getNearCornersId = (modelArr, [x, y], type="all") => {
@@ -173,6 +204,11 @@ getGuidesofArr = (arr) => {
     let all = [];
     if (arr.length) {
         arr.map(model => model.guides).map(guide => all = all.concat(guide));
+        arr.forEach(model => {
+            if(model.center) {
+                all.push(model.centerGuide)
+            }
+        });
     }
     return all;
 }
@@ -188,13 +224,14 @@ getRandomColor = () => {
   
 
 lineMode = () => {
-    if (modeLine == 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner != 0) {
-        modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0;
+    if (modeLine == 0) {
+        modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
         btn_line.classList.add("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
         btn_movecorner.classList.remove("btn-purple");
+        btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing line";
         tempModel = [];
@@ -210,13 +247,14 @@ lineMode = () => {
 }
 
 squareMode = () => {
-    if (modeSquare == 0 || modeLine != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner != 0) {
-        modeLine = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0;
+    if (modeSquare == 0) {
+        modeLine = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
         btn_square.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
         btn_movecorner.classList.remove("btn-purple");
+        btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing square";
         tempModel = [];
@@ -232,13 +270,14 @@ squareMode = () => {
 }
 
 rectangleMode = () => {
-    if (modeRectangle == 0 || modeLine != 0 || modeSquare != 0 || modePolygon != 0 || modeMoveCorner != 0) {
-        modeLine = 0; modeSquare = 0; modePolygon = 0; modeMoveCorner = 0;
+    if (modeRectangle == 0) {
+        modeLine = 0; modeSquare = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
         btn_rectangle.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
         btn_movecorner.classList.remove("btn-purple");
+        btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing rectangle";
         tempModel = [];
@@ -254,13 +293,14 @@ rectangleMode = () => {
 }
 
 polygonMode = () => {
-    if (modePolygon == 0 || modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modeMoveCorner != 0) {
-        modeLine = 0; modeSquare = 0; modeRectangle = 0; modeMoveCorner = 0;
+    if (modePolygon == 0) {
+        modeLine = 0; modeSquare = 0; modeRectangle = 0; modeMoveCorner = 0; modeSelect = 0;
         btn_polygon.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_movecorner.classList.remove("btn-purple");
+        btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility='visible'
         canvasLabel.innerText = "Drawing polygon";
         if (modeConvex == 1) {
@@ -421,12 +461,13 @@ randomColor = () => {
 }
 
 moveCorner = () => {
-    if (modeMoveCorner == 0 || modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0) {
-        modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0;
+    if (modeMoveCorner == 0) {
+        modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeSelect = 0;
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
+        btn_select.classList.remove("button-shape-selected");
         btn_movecorner.classList.add("btn-purple");
         canvasLabel.innerText = "Moving corner";
         btn_convex.style.visibility = 'hidden';
@@ -438,5 +479,26 @@ moveCorner = () => {
         btn_movecorner.classList.remove("btn-purple");
         canvasLabel.innerText = "";
         modeMoveCorner = 0;
+    }
+}
+
+selectMode = () => {
+    if (modeSelect == 0) {
+        modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner=0;
+        btn_line.classList.remove("button-shape-selected");
+        btn_square.classList.remove("button-shape-selected");
+        btn_rectangle.classList.remove("button-shape-selected");
+        btn_polygon.classList.remove("button-shape-selected");
+        btn_movecorner.classList.remove("btn-purple");        
+        btn_select.classList.add("btn-purple");
+        canvasLabel.innerText = "Selecting model";
+        tempModel = [];
+        modeSelect = 1;
+        console.log(`Selecting model`);
+    } else if (modeSelect == 1) {
+        btn_select.classList.remove("btn-purple");
+        canvasLabel.innerText = "";
+        modeSelect = 0;
+        selectedModel = null;
     }
 }

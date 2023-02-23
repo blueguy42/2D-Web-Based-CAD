@@ -13,6 +13,7 @@ const btn_load = document.getElementById('btn-load');
 const btn_clear = document.getElementById('btn-clear');
 const btn_randomcolor = document.getElementById('btn-random-color');
 const btn_movecorner = document.getElementById('btn-move-corner');
+const btn_select = document.getElementById('btn-select');
 
 var chosenColor = getRandomColor();
 
@@ -27,10 +28,13 @@ var modePolygon = 0;
 var modeCoordinate = 0;
 var modeConvex = 0;
 var modeMoveCorner = 0;
+var modeSelect = 0;
 
 var moveCorners = [];
 var moveMousePos = [];
 var moveIsEdgeExist = false;
+
+var selectedModel = null;
 
 colorWheel.value = chosenColor;
 colorWheel.style.backgroundColor = chosenColor;
@@ -48,6 +52,7 @@ canvas.addEventListener('mousedown', function(e) {
         moveCorners = getNearCornersId(models, coordinate);
         moveMousePos = coordinate;
         modeMoveCorner = 2;
+        return;
     }
 })
 
@@ -65,7 +70,7 @@ canvas.addEventListener('mousemove', function(e) {
     let coordinate = getCanvasCoordinate(e);
     canvas.style.cursor = "default";
     canvasLabel.innerText = "";
-    if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner != 0) {
+    if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner != 0 || modeSelect != 0) {
         if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner == 2) {
             canvas.style.cursor = "crosshair";
             let crosshairX = new Line(crosshair.length);
@@ -91,6 +96,8 @@ canvas.addEventListener('mousemove', function(e) {
             canvasLabel.innerText += "\nDOUBLE CLICK to finish";
         } else if (modeMoveCorner != 0) {
             canvasLabel.innerText += "Moving corner";
+        } else if(modeSelect != 0) {
+            canvasLabel.innerText += "Selecting model";
         }
         canvasLabel.innerText += "\n";
     }
@@ -115,6 +122,15 @@ canvas.addEventListener('mousemove', function(e) {
             }
         } else if (modeMoveCorner == 2) {
             setNearCornersCoordinate(models, moveMousePos, coordinate, moveCorners);
+        }
+    } else if(modeSelect != 0) {
+        let hovered = getNearPoint(coordinate);
+        if(hovered[0] && hovered[1] == -1) { //center
+            canvas.style.cursor = "pointer";
+            canvasLabel.innerText += "HoveredId: " + hovered[0].id + "\n";
+        }
+        if(selectedModel) {
+            canvasLabel.innerText += "SelectedId: " + selectedModel.id + "\n";
         }
     }
     if (modeCoordinate == 0) {
@@ -161,6 +177,12 @@ canvas.addEventListener('click', function(e) {
         modePolygon = 2;
     } else if (modePolygon == 2) {
         tempModel[0].addCorner(new Coordinate(coordinate), new Color(chosenColor));
+    } else if(modeSelect != 0) {
+        let hovered = getNearPoint(coordinate);
+        if(hovered[0] && hovered[1] == -1) { //center
+            selectedModel = hovered[0];
+            canvasLabel.innerText += "SelectedId: " + selectedModel.id + "\n";
+        }
     }
 })
 
@@ -192,6 +214,11 @@ canvas.addEventListener('mouseleave', function(e) {
         canvasLabel.innerText += "\nDOUBLE CLICK to finish";
     } else if (modeMoveCorner != 0) {
         canvasLabel.innerText = "Moving corner";
+    } else if(modeSelect!=0) {
+        canvasLabel.innerText = "Selecting model\n";
+        if(selectedModel) {
+            canvasLabel.innerText += "SelectedId: " + selectedModel.id + "\n";
+        }
     } else {
         canvasLabel.innerText = "";
     }
@@ -209,6 +236,7 @@ btn_load.addEventListener('click', function(e) {loadModel()})
 btn_clear.addEventListener('click', function(e) {clearModel()})
 btn_randomcolor.addEventListener('click', function(e) {randomColor()})
 btn_movecorner.addEventListener('click', function(e) {moveCorner()})
+btn_select.addEventListener('click', function(e) {selectMode()})
 
 btn_line.addEventListener('mouseover', function(e) {
     canvasLabel.innerText = "Draw line";
@@ -267,6 +295,10 @@ btn_movecorner.addEventListener('mouseover', function(e) {
     canvasLabel.innerText = "Move corner";
 })
 
+btn_select.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Selecting model";
+})
+
 btn_line.addEventListener('mouseleave', function(e) {
     canvasLabel.innerText = "";
 })
@@ -308,6 +340,10 @@ btn_randomcolor.addEventListener('mouseleave', function(e) {
 })
 
 btn_movecorner.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_select.addEventListener('mouseleave', function(e) {
     canvasLabel.innerText = "";
 })
 

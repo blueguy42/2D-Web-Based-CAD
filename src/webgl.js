@@ -92,7 +92,7 @@ if (!gl) {
       model.render();
     });
   
-    if (modeLine || modeSquare || modeRectangle || modePolygon || modeMoveCorner) {
+    if (modeLine || modeSquare || modeRectangle || modePolygon || modeMoveCorner || modeSelect) {
       let guides = getGuidesofArr(models);
       guides.forEach(guide => {
         guide.render();

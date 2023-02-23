@@ -46,6 +46,12 @@ class Model {
   }
 }
 
+setupCenterForModel = (model) => {
+  model.center = getCenterPoint(model.vertices);
+  model.centerGuide = new Guide();
+  model.centerGuide.setGuide(model.center.coordinate);
+}
+
 class Line extends Model {
   constructor(id = -1) {
     super(id, "line");
@@ -68,6 +74,7 @@ class Line extends Model {
 
     this.guides[0].setGuide(coordinate1);
     this.guides[1].setGuide(coordinate2);
+    setupCenterForModel(this);
   }
 
   render = () => {
@@ -151,6 +158,7 @@ class Rectangle extends Model {
     this.guides[1].setGuide(new Coordinate([coordinate2.x, coordinate1.y]));
     this.guides[2].setGuide(coordinate2);
     this.guides[3].setGuide(new Coordinate([coordinate1.x, coordinate2.y]));
+    setupCenterForModel(this);
   }
 
   render = () => {
@@ -244,6 +252,7 @@ class Square extends Rectangle {
     this.guides[1].setGuide(new Coordinate([newCoordinate.x, coordinate1.y]));
     this.guides[2].setGuide(newCoordinate);
     this.guides[3].setGuide(new Coordinate([coordinate1.x, newCoordinate.y]));
+    setupCenterForModel(this);
   }
 }
 
@@ -342,15 +351,15 @@ class Polygon extends Model {
     this.vertices = this.vertices.slice(0, -3);
     this.guides = this.guides.slice(0, -3);
     this.makeConvexHull();
-    
+    setupCenterForModel(this);
   }
 
   makeConvexHull = () => {
     if (this.convex && this.vertices.length > 2) {
-      let outsideVert = convexHull(this.vertices);
-      outsideVert = sortAntiClockwise(outsideVert);
-      this.vertices = [new Point(new Coordinate(getCenter(outsideVert)), this.vertices[0].color)].concat(outsideVert);
-      this.addCorner(this.vertices[1].coordinate, this.vertices[1].color);
+      this.vertices = convexHull(this.vertices);
+      sortAntiClockwise(this.vertices);
+      // this.vertices = [new Point(new Coordinate(getCenter(outsideVert)), this.vertices[0].color)].concat(outsideVert);
+      this.addCorner(this.vertices[0].coordinate, this.vertices[0].color);
       this.guides = [];
       this.vertices.forEach((vertex) => {
         let guide1 = new Guide(this.guides.length);
@@ -363,6 +372,13 @@ class Polygon extends Model {
   render = () => {
     const polygonVertices = [];
 
+    if(this.convex && this.center) {
+      polygonVertices.push(getCanvastoWebGL_X(canvas, this.center.coordinate.x));
+      polygonVertices.push(getCanvastoWebGL_Y(canvas, this.center.coordinate.y));
+      polygonVertices.push(this.center.color.r / 255);
+      polygonVertices.push(this.center.color.g / 255);
+      polygonVertices.push(this.center.color.b / 255);
+    }
     this.vertices.forEach((vertex) => {
       polygonVertices.push(getCanvastoWebGL_X(canvas, vertex.coordinate.x));
       polygonVertices.push(getCanvastoWebGL_Y(canvas, vertex.coordinate.y));
@@ -398,12 +414,12 @@ class Polygon extends Model {
     gl.enableVertexAttribArray(positionAttribLocation);
     gl.enableVertexAttribArray(colorAttribLocation);
 
-    if (this.vertices.length == 1) {
-      gl.drawArrays(gl.POINTS, 0, this.vertices.length);
-    } else if (this.vertices.length == 2) {
-      gl.drawArrays(gl.LINES, 0, this.vertices.length);
+    if (polygonVertices.length/5 == 1) {
+      gl.drawArrays(gl.POINTS, 0, polygonVertices.length/5);
+    } else if (polygonVertices.length/5 == 2) {
+      gl.drawArrays(gl.LINES, 0, polygonVertices.length/5);
     } else {
-      gl.drawArrays(gl.TRIANGLE_FAN, 0, this.vertices.length);
+      gl.drawArrays(gl.TRIANGLE_FAN, 0, polygonVertices.length/5);
     }
   }
 }
