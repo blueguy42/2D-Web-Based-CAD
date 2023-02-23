@@ -331,9 +331,10 @@ class Polygon extends Model {
     this.vertices = this.vertices.slice(0, -3);
     this.guides = this.guides.slice(0, -3);
     if (this.convex) {
-      this.vertices = convexHull(this.vertices);
-      this.vertices = sortAntiClockwise(this.vertices);
-    this.addCorner(this.vertices[1].coordinate, this.vertices[0].color);
+      let outsideVert = convexHull(this.vertices);
+      outsideVert = sortAntiClockwise(outsideVert);
+      this.vertices = [new Point(new Coordinate(getCenter(outsideVert)), this.vertices[0].color)].concat(outsideVert);
+    this.addCorner(this.vertices[1].coordinate, this.vertices[1].color);
     this.guides = [];
     this.vertices.forEach((vertex) => {
       let guide1 = new Guide(this.guides.length);
@@ -398,11 +399,7 @@ class Polygon extends Model {
     } else if (this.vertices.length == 2) {
       gl.drawArrays(gl.LINES, 0, this.vertices.length);
     } else {
-      if (this.convex) {
         gl.drawArrays(gl.TRIANGLE_FAN, 0, this.vertices.length);
-      } else {
-        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT,0);
-      }
     }
   }
 }
