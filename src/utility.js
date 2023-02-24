@@ -293,7 +293,6 @@ polygonMode = () => {
         } else {
             canvasLabel.innerText += "\nNon-convex mode";
         }
-        canvasLabel.innerText += "\nDOUBLE CLICK to finish";
         tempModel = [];
         modePolygon = 1;
         console.log(`Drawing polygon`);

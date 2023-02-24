@@ -119,7 +119,7 @@ canvas.addEventListener('mousemove', function(e) {
         } else if(modeSelect != 0) {
             canvasLabel.innerText += "Selecting model";
         }
-        canvasLabel.innerText += "\n";
+        canvasLabel.innerText += `\n`;
     }
     if (modeLine == 2) {
         tempModel[0].setLine(tempModel[0].vertices[0].coordinate, tempModel[0].vertices[0].color, new Coordinate(coordinate), new Color(chosenColor));
@@ -133,6 +133,7 @@ canvas.addEventListener('mousemove', function(e) {
         let corners = getNearCornersId(models, coordinate);
         if (modeMoveCorner == 1) {
             if (corners.length > 0) {
+                canvasLabel.innerText += `HoveredModelId: ${corners[0][0]}\nHoveredVertexId: ${corners[0][1]}\n`;
                 canvas.style.cursor = "all-scroll";
                 moveIsEdgeExist = true;
             } else {
@@ -142,15 +143,16 @@ canvas.addEventListener('mousemove', function(e) {
             }
         } else if (modeMoveCorner == 2) {
             setNearCornersCoordinate(models, moveMousePos, coordinate, moveCorners);
+            canvasLabel.innerText += `SelectedModelId: ${moveCorners[0][0]}\nSelectedVertexId: ${moveCorners[0][1]}\n`;
         }
     } else if(modeSelect != 0) {
         let hovered = getNearPoint(coordinate);
         if(hovered[0] && hovered[1] == -1) { //center
             canvas.style.cursor = "pointer";
-            canvasLabel.innerText += "HoveredId: " + hovered[0].id + "\n";
+            canvasLabel.innerText += "\nHoveredId: " + hovered[0].id;
         }
         if(selectedModel) {
-            canvasLabel.innerText += "SelectedId: " + selectedModel.id + "\n";
+            canvasLabel.innerText += "\nSelectedId: " + selectedModel.id;
         }
     }
     if (modeCoordinate == 0) {
@@ -231,7 +233,6 @@ canvas.addEventListener('mouseleave', function(e) {
         } else {
             canvasLabel.innerText += "\nNon-convex mode";
         }
-        canvasLabel.innerText += "\nDOUBLE CLICK to finish";
     } else if (modeMoveCorner != 0) {
         canvasLabel.innerText = "Moving corner";
     } else if(modeSelect!=0) {
