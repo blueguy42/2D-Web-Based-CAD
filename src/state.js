@@ -82,13 +82,25 @@ canvas.addEventListener('mousemove', function(e) {
         }
         if (modeLine != 0) {
             canvasLabel.innerText += "Drawing line";
-            canvasLabel.innerText += `\nPoint ${tempModel.length+1}`;
+            if (modeLine == 1) {
+                canvasLabel.innerText += `\nCLICK to start drawing`;
+            } else if (modeLine == 2) {
+                canvasLabel.innerText += `\nCLICK to finish drawing`;
+            }
         } else if (modeSquare != 0) {
             canvasLabel.innerText += "Drawing square";
-            canvasLabel.innerText += `\nPoint ${tempModel.length+1}`;
+            if (modeSquare == 1) {
+                canvasLabel.innerText += `\nCLICK to start drawing`;
+            } else if (modeSquare == 2) {
+                canvasLabel.innerText += `\nCLICK to finish drawing`;
+            }
         } else if (modeRectangle != 0) {
             canvasLabel.innerText += "Drawing rectangle";
-            canvasLabel.innerText += `\nPoint ${tempModel.length+1}`;
+            if (modeRectangle == 1) {
+                canvasLabel.innerText += `\nCLICK to start drawing`;
+            } else if (modeRectangle == 2) {
+                canvasLabel.innerText += `\nCLICK to finish drawing`;
+            }
         } else if (modePolygon != 0) {
             canvasLabel.innerText += "Drawing polygon";
             if (modeConvex == 1) {
@@ -97,9 +109,9 @@ canvas.addEventListener('mousemove', function(e) {
                 canvasLabel.innerText += "\nNon-convex mode";
             }
             if (modePolygon == 1) {
-            canvasLabel.innerText += `\nPoint 1`;
+                canvasLabel.innerText += "\nCLICK to start drawing";
             } else if (modePolygon == 2) {
-                canvasLabel.innerText += `\nPoint ${tempModel[0].vertices.length}`;
+            canvasLabel.innerText += "\n CLICK to draw another corner";
                 canvasLabel.innerText += "\nDOUBLE CLICK to finish";
             }
         } else if (modeMoveCorner != 0) {
