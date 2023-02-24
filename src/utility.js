@@ -53,7 +53,6 @@ sortAntiClockwise = (vertices) => {
         let angle2 = Math.atan2(vertex2.coordinate.y - center[1], vertex2.coordinate.x - center[0]);
         return angle1 - angle2;
     });
-    // return vertices;
 }
 
 euclideanDistance = (x1, y1, x2, y2) => {
@@ -126,20 +125,14 @@ getNearCornersId = (modelArr, [x, y], type="all") => {
 setNearCornersCoordinate = (modelArr, [startX, startY], [endX, endY], nearcorners) => {
     // sets corner vertex and guide from getNearCorners to new coordinate in relation to mouse position
     let corner0 = nearcorners[0];
-    let changeableCorners = nearcorners.filter(corner => corner[0] == corner0[0]);
-    for (let i = 0; i < changeableCorners.length; i++) {
-        let nearcorner = changeableCorners[i];
-        // check if corner is part of a convex polygon and is the second or last vertex. If not convex polygon corner is first vertex of changeable corners
-        if ((nearcorner[4][0] == "polygon" && nearcorner[4][1] && [1, modelArr[nearcorner[0]].vertices.length-1].includes(nearcorner[1])) || i == 0) {
-            let model = modelArr[nearcorner[0]];
-            let vertex = model.vertices[nearcorner[1]];
-            vertex.coordinate.x = endX - startX + nearcorner[2];
-            vertex.coordinate.y = endY - startY + nearcorner[3];
-            let newGuide = new Guide(nearcorner[1]);
-            newGuide.setGuide(new Coordinate([vertex.coordinate.x, vertex.coordinate.y]));
-            model.guides[nearcorner[1]] = newGuide;
-        }
-    }
+    let model = modelArr[corner0[0]];
+    let vertex = model.vertices[corner0[1]];
+    vertex.coordinate.x = endX - startX + corner0[2];
+    vertex.coordinate.y = endY - startY + corner0[3];
+    let newGuide = new Guide(corner0[1]);
+    newGuide.setGuide(new Coordinate([vertex.coordinate.x, vertex.coordinate.y]));
+    model.guides[corner0[1]] = newGuide;
+    model.setupCenterForModel();
 }
 
 setNearCornersColor = (modelArr, nearcorners, newColor) => {
@@ -148,17 +141,7 @@ setNearCornersColor = (modelArr, nearcorners, newColor) => {
     let model = modelArr[nearcorner[0]];
     let vertex = model.vertices[nearcorner[1]];
     vertex.color = newColor;
-
-    let corner0 = nearcorners[0];
-    let changeableCorners = nearcorners.filter(corner => corner[0] == corner0[0]);
-    for (let i = 0; i < changeableCorners.length; i++) {
-        let nearcorner = changeableCorners[i];
-        if ((nearcorner[4][0] == "polygon" && nearcorner[4][1] && [1, modelArr[nearcorner[0]].vertices.length].includes(nearcorner[1])) || i == 0) {
-            let model = modelArr[nearcorner[0]];
-            let vertex = model.vertices[nearcorner[1]];
-            vertex.color = newColor;
-        }
-    }
+    model.setupCenterForModel();
 }
     
 // Monotone chain
@@ -203,12 +186,14 @@ convexHull = (vertices) => {
 getGuidesofArr = (arr) => {
     let all = [];
     if (arr.length) {
-        arr.map(model => model.guides).map(guide => all = all.concat(guide));
-        arr.forEach(model => {
-            if(model.center) {
+        if (!modeSelect) {
+            arr.map(model => model.guides).map(guide => all = all.concat(guide));
+        }
+        if (!modeMoveCorner) {
+            arr.forEach(model => {
                 all.push(model.centerGuide)
-            }
-        });
+            });
+        }
     }
     return all;
 }
@@ -441,14 +426,10 @@ clearModel = () => {
     }
     models = [];
     tempModel = [];
-    crosshair = [];
-    modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0;
-    btn_line.classList.remove("button-shape-selected");
-    btn_square.classList.remove("button-shape-selected");
-    btn_rectangle.classList.remove("button-shape-selected");
-    btn_polygon.classList.remove("button-shape-selected");
-    btn_movecorner.classList.remove("btn-purple");
-    btn_convex.style.visibility = 'hidden';
+    modeLine = modeLine ? 1 : 0;
+    modeSquare = modeSquare ? 1 : 0;
+    modeRectangle = modeRectangle ? 1 : 0;
+    modePolygon = modePolygon ? 1 : 0;
 }
 
 randomColor = () => {

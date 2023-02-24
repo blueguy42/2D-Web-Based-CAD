@@ -82,10 +82,13 @@ canvas.addEventListener('mousemove', function(e) {
         }
         if (modeLine != 0) {
             canvasLabel.innerText += "Drawing line";
+            canvasLabel.innerText += `\nPoint ${tempModel.length+1}`;
         } else if (modeSquare != 0) {
             canvasLabel.innerText += "Drawing square";
+            canvasLabel.innerText += `\nPoint ${tempModel.length+1}`;
         } else if (modeRectangle != 0) {
             canvasLabel.innerText += "Drawing rectangle";
+            canvasLabel.innerText += `\nPoint ${tempModel.length+1}`;
         } else if (modePolygon != 0) {
             canvasLabel.innerText += "Drawing polygon";
             if (modeConvex == 1) {
@@ -93,7 +96,12 @@ canvas.addEventListener('mousemove', function(e) {
             } else {
                 canvasLabel.innerText += "\nNon-convex mode";
             }
-            canvasLabel.innerText += "\nDOUBLE CLICK to finish";
+            if (modePolygon == 1) {
+            canvasLabel.innerText += `\nPoint 1`;
+            } else if (modePolygon == 2) {
+                canvasLabel.innerText += `\nPoint ${tempModel[0].vertices.length}`;
+                canvasLabel.innerText += "\nDOUBLE CLICK to finish";
+            }
         } else if (modeMoveCorner != 0) {
             canvasLabel.innerText += "Moving corner";
         } else if(modeSelect != 0) {
