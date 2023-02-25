@@ -48,11 +48,14 @@ colorWheel.addEventListener('change', function(e) {
     chosenColor = e.target.value;
     colorLabel.innerText = e.target.value;
     console.log(`Color wheel: ${chosenColor}`);
-    if (lastSelectedModelId != null){
+    if (lastSelectedModelId != null & modeMoveCorner != 0){
         resetCanvasLabel()
         models[lastSelectedModelId].vertices[lastSelectedVerticeId].setColor(new Color(chosenColor));
         models[lastSelectedModelId].render();
-
+    } else if (modeSelect != 0 & selectedModel != null){
+        resetCanvasLabel()
+        selectedModel.setColor(new Color(chosenColor));
+        selectedModel.render();
     }
 })
 

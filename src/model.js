@@ -36,6 +36,13 @@ class Model {
     this.vertices.push(new Point(coordinate, color, this.vertices.length));
   }
 
+  setColor = (color) => {
+    this.vertices.forEach((vertex) => {
+      vertex.setColor(color);
+    });
+    this.center.setColor(color);
+  }
+
   getVertexCount = () => this.vertices.length;
 
   copy = (other) => {
