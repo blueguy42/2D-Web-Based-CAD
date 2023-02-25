@@ -77,6 +77,34 @@ class Line extends Model {
     this.setupCenterForModel();
   }
 
+  getLength = () => {
+    return euclideanDistance(
+      this.vertices[0].coordinate.x, this.vertices[0].coordinate.y,
+      this.vertices[1].coordinate.x, this.vertices[1].coordinate.y);
+  }
+
+  setLength = (newLength) => {
+    let oldLength = this.getLength();
+    let midpoint = new Coordinate(
+      [
+        (this.vertices[0].coordinate.x + this.vertices[1].coordinate.x)/2,
+        (this.vertices[0].coordinate.y + this.vertices[1].coordinate.y)/2
+      ]
+    ) 
+    let newX1 = this.vertices[0].coordinate.x - midpoint.x;
+    let newY1 = this.vertices[0].coordinate.y - midpoint.y;
+    let newX2 = this.vertices[1].coordinate.x - midpoint.x;
+    let newY2 = this.vertices[1].coordinate.y - midpoint.y;
+    
+    let ratio = newLength/oldLength;
+    newX1 *= ratio; newY1 *= ratio; newX2 *= ratio; newY2 *= ratio;
+
+    newX1 += midpoint.x; newY1 += midpoint.y;
+    newX2 += midpoint.x; newY2 += midpoint.y;
+
+    this.setLine(new Coordinate([newX1, newY1]), this.vertices[0].color, new Coordinate([newX2, newY2]), this.vertices[1].color);
+  } 
+
   render = () => {
     const lineVertices = [];
 
@@ -162,6 +190,73 @@ class Rectangle extends Model {
     this.setupCenterForModel();
   }
 
+  setRectangle4Coloured = (coordinate1, color1, coordinate2, color2, color3, color4) => {
+    this.vertices[0].coordinate = coordinate1;
+    this.vertices[0].color = color1;
+    this.vertices[1].coordinate = new Coordinate([coordinate2.x, coordinate1.y]);
+    this.vertices[1].color = color2;
+    this.vertices[2].coordinate = coordinate2;
+    this.vertices[2].color = color3;
+    this.vertices[3].coordinate = new Coordinate([coordinate1.x, coordinate2.y]);
+    this.vertices[3].color = color4;
+
+    this.guides[0].setGuide(coordinate1);
+    this.guides[1].setGuide(new Coordinate([coordinate2.x, coordinate1.y]));
+    this.guides[2].setGuide(coordinate2);
+    this.guides[3].setGuide(new Coordinate([coordinate1.x, coordinate2.y]));
+    this.setupCenterForModel();
+  }
+
+  getWidth = () => {
+    return euclideanDistance(
+      this.vertices[0].coordinate.x, this.vertices[0].coordinate.y, 
+      this.vertices[1].coordinate.x, this.vertices[0].coordinate.y);
+  }
+
+  setWidth = (newWidth) => {
+    let oldWidth = this.getWidth();
+    let ratio = newWidth / oldWidth;
+    let bottom_midpoint = new Coordinate(
+      [(this.vertices[0].coordinate.x + this.vertices[1].coordinate.x)/2,
+      (this.vertices[0].coordinate.y + this.vertices[1].coordinate.y)/2]);
+    let top_midpoint = new Coordinate(
+      [(this.vertices[2].coordinate.x + this.vertices[3].coordinate.x)/2,
+      (this.vertices[2].coordinate.y + this.vertices[3].coordinate.y)/2]);
+    let new_x1 = (this.vertices[0].coordinate.x - bottom_midpoint.x) * ratio + bottom_midpoint.x;
+    let new_x2 = (this.vertices[2].coordinate.x - top_midpoint.x) * ratio + top_midpoint.x;
+    let new_y1 = (this.vertices[0].coordinate.y - bottom_midpoint.y) * ratio + bottom_midpoint.y;
+    let new_y2 = (this.vertices[2].coordinate.y - top_midpoint.y) * ratio + top_midpoint.y;
+    this.setRectangle4Coloured(
+      new Coordinate([new_x1, new_y1]), this.vertices[0].color, 
+      new Coordinate([new_x2, new_y2]), this.vertices[2].color,
+      this.vertices[1].color, this.vertices[3].color);
+  }
+
+  getHeight = () => {
+    return euclideanDistance(
+      this.vertices[0].coordinate.x, this.vertices[0].coordinate.y,
+      this.vertices[3].coordinate.x, this.vertices[3].coordinate.y);
+  }
+
+  setHeight = (newHeight) => {
+    let oldHeight = this.getHeight();
+    let ratio = newHeight / oldHeight;
+    let left_midpoint = new Coordinate(
+      [(this.vertices[0].coordinate.x + this.vertices[3].coordinate.x)/2,
+      (this.vertices[0].coordinate.y + this.vertices[3].coordinate.y)/2]);
+    let right_midpoint = new Coordinate(
+      [(this.vertices[1].coordinate.x + this.vertices[2].coordinate.x)/2,
+      (this.vertices[1].coordinate.y + this.vertices[2].coordinate.y)/2]);
+    let new_x1 = (this.vertices[0].coordinate.x - left_midpoint.x) * ratio + left_midpoint.x;
+    let new_x2 = (this.vertices[2].coordinate.x - right_midpoint.x) * ratio + right_midpoint.x;
+    let new_y1 = (this.vertices[0].coordinate.y - left_midpoint.y) * ratio + left_midpoint.y;
+    let new_y2 = (this.vertices[2].coordinate.y - right_midpoint.y) * ratio + right_midpoint.y;
+    this.setRectangle4Coloured(
+      new Coordinate([new_x1, new_y1]), this.vertices[0].color,
+      new Coordinate([new_x2, new_y2]), this.vertices[2].color,
+      this.vertices[1].color, this.vertices[3].color);
+  }
+
   render = () => {
     const rectangleVertices = [];
 
@@ -239,7 +334,7 @@ class Square extends Rectangle {
       newCoordinate.x = coordinate1.x + xSign;
       newCoordinate.y = coordinate1.y + ySign;
     }
-    
+
     this.vertices[0].coordinate = coordinate1;
     this.vertices[0].color = color1;
     this.vertices[1].coordinate = new Coordinate([newCoordinate.x, coordinate1.y]);
@@ -254,6 +349,59 @@ class Square extends Rectangle {
     this.guides[2].setGuide(newCoordinate);
     this.guides[3].setGuide(new Coordinate([coordinate1.x, newCoordinate.y]));
     this.setupCenterForModel();
+  }
+
+  setSquare4Coloured = (coordinate1, color1, coordinate2, color2, coordinate3, color3, coordinate4, color4) => {
+    this.vertices[0].coordinate = coordinate1;
+    this.vertices[0].color = color1;
+    this.vertices[1].coordinate = coordinate2;
+    this.vertices[1].color = color2;
+    this.vertices[2].coordinate = coordinate3;
+    this.vertices[2].color = color3;
+    this.vertices[3].coordinate = coordinate4;
+    this.vertices[3].color = color4;
+
+    this.guides[0].setGuide(coordinate1);
+    this.guides[1].setGuide(coordinate2);
+    this.guides[2].setGuide(coordinate3);
+    this.guides[3].setGuide(coordinate4);
+    this.setupCenterForModel();
+  }
+
+  getLength = () => {
+    return euclideanDistance(
+      this.vertices[0].coordinate.x, this.vertices[0].coordinate.y,
+      this.vertices[1].coordinate.x, this.vertices[1].coordinate.y
+    )
+  }
+  
+  setLength = (newLength) => {
+    let oldLength = this.getLength();
+    let ratio = newLength/oldLength;
+
+    let center_x = (
+      this.vertices[0].coordinate.x + this.vertices[1].coordinate.x 
+      + this.vertices[2].coordinate.x + this.vertices[3].coordinate.x)/4;
+    let center_y = (
+      this.vertices[0].coordinate.y + this.vertices[1].coordinate.y 
+      + this.vertices[2].coordinate.y + this.vertices[3].coordinate.y)/4;
+    let center = new Coordinate([center_x, center_y]);
+
+    let new_x1 = center.x + ((this.vertices[0].coordinate.x - center.x) * ratio);
+    let new_y1 = center.y + ((this.vertices[0].coordinate.y - center.y) * ratio);
+    let new_x2 = center.x + ((this.vertices[1].coordinate.x - center.x) * ratio);
+    let new_y2 = center.y + ((this.vertices[1].coordinate.y - center.y) * ratio);
+    let new_x3 = center.x + ((this.vertices[2].coordinate.x - center.x) * ratio);
+    let new_y3 = center.y + ((this.vertices[2].coordinate.y - center.y) * ratio);
+    let new_x4 = center.x + ((this.vertices[3].coordinate.x - center.x) * ratio);
+    let new_y4 = center.y + ((this.vertices[3].coordinate.y - center.y) * ratio);
+    
+    this.setSquare4Coloured(
+      new Coordinate([new_x1, new_y1]), this.vertices[0].color,
+      new Coordinate([new_x2, new_y2]), this.vertices[1].color,
+      new Coordinate([new_x3, new_y3]), this.vertices[2].color,
+      new Coordinate([new_x4, new_y4]), this.vertices[3].color
+    )
   }
 }
 

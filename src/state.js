@@ -14,6 +14,7 @@ const btn_clear = document.getElementById('btn-clear');
 const btn_randomcolor = document.getElementById('btn-random-color');
 const btn_movecorner = document.getElementById('btn-move-corner');
 const btn_select = document.getElementById('btn-select');
+const property_sidebar = document.getElementById('property');
 
 var chosenColor = getRandomColor();
 
@@ -152,7 +153,8 @@ canvas.addEventListener('mousemove', function(e) {
             canvasLabel.innerText += "\nHoveredId: " + hovered[0].id;
         }
         if(selectedModel) {
-            canvasLabel.innerText += "\nSelectedId: " + selectedModel.id;
+            canvasLabel.innerText += "\nSelectedModel: " + selectedModel.type;
+            canvasLabel.innerText += "\nSelectedId: " + selectedModel.id + "\n";
         }
     }
     if (modeCoordinate == 0) {
@@ -203,6 +205,7 @@ canvas.addEventListener('click', function(e) {
         let hovered = getNearPoint(coordinate);
         if(hovered[0] && hovered[1] == -1) { //center
             selectedModel = hovered[0];
+            handleShapeSelected(selectedModel);
             canvasLabel.innerText += "SelectedId: " + selectedModel.id + "\n";
         }
     }
@@ -392,5 +395,7 @@ document.addEventListener('keyup', function(e) {
         randomColor();
     } else if (key == "z") {
         moveCorner();
+    } else if (key == "x") {
+        selectMode();
     }
 })

@@ -28,6 +28,22 @@ div#sidebar {
   gap: 15px;
 }
 
+div.sidebar-sliders {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.sidebar-sliders * {
+  margin: 0;
+}
+
+/* the child of slidebar sliders with the class name of slider will have width of 20em */
+.sidebar-sliders .slider {
+  width: 20em;
+}
+
 div.sidebar-item {
   display: flex;
   flex-direction: row;

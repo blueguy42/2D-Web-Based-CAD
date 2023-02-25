@@ -210,6 +210,7 @@ getRandomColor = () => {
 
 lineMode = () => {
     if (modeLine == 0) {
+        handleShapeUnselected();
         modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
         btn_line.classList.add("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
@@ -233,6 +234,7 @@ lineMode = () => {
 
 squareMode = () => {
     if (modeSquare == 0) {
+        handleShapeUnselected();
         modeLine = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
         btn_square.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
@@ -256,6 +258,7 @@ squareMode = () => {
 
 rectangleMode = () => {
     if (modeRectangle == 0) {
+        handleShapeUnselected();
         modeLine = 0; modeSquare = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
         btn_rectangle.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
@@ -353,6 +356,7 @@ saveFile = (filename, content) => {
 
 saveModel = () => {
     console.log(models);
+    handleShapeUnselected();
     if (models.length == 0) {
         canvasLabel.innerText = "No model to save";
     } else {
@@ -442,12 +446,13 @@ randomColor = () => {
 
 moveCorner = () => {
     if (modeMoveCorner == 0) {
+        handleShapeUnselected();
         modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeSelect = 0;
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
-        btn_select.classList.remove("button-shape-selected");
+        btn_select.classList.remove("btn-purple");
         btn_movecorner.classList.add("btn-purple");
         canvasLabel.innerText = "Moving corner";
         btn_convex.style.visibility = 'hidden';
@@ -480,5 +485,56 @@ selectMode = () => {
         canvasLabel.innerText = "";
         modeSelect = 0;
         selectedModel = null;
+        handleShapeUnselected();
     }
+}
+
+handleShapeUnselected = () => {
+    property_sidebar.innerHTML = "";
+}
+
+handleShapeSelected = (shapeModel) => {
+    // input an h4 that contains the shape name into property sidebar div
+    let inner = "";
+    if(shapeModel.type == "line") {
+        let lineLength = shapeModel.getLength();
+        inner += '<h4>Length</h4><input type="range" id="length-slider" min="0.1" max="1000" value="' + lineLength + '" class="slider">';
+        property_sidebar.innerHTML = inner;
+        const length_slider = document.getElementById('length-slider');
+        length_slider.addEventListener('input', function() {
+            if (shapeModel) {
+                shapeModel.setLength(length_slider.value);
+            }
+        })
+    } else if(shapeModel.type == "square") {
+        let length = shapeModel.getLength();
+        inner += '<div><h4>Length</h4><input type="range" id="length-slider" min="0.1" max="1000" value="' + length + '" class="slider"></div>';
+        property_sidebar.innerHTML = inner;
+        const length_slider = document.getElementById('length-slider');
+        length_slider.addEventListener('input', function() {
+            if (shapeModel) {
+                shapeModel.setLength(length_slider.value);
+            }
+        })
+    } else if(shapeModel.type == "rectangle") {
+        let width = shapeModel.getWidth();
+        let height = shapeModel.getHeight();
+        inner += '<div><h4>Width</h4><input type="range" id="width-slider" min="0.1" max="1000" value="' + width + '" class="slider"></div>';
+        inner += '<div><h4>Height</h4><input type="range" id="height-slider" min="0.1" max="1000" value="' + height + '" class="slider"></div>';
+        property_sidebar.innerHTML = inner;
+        const width_slider = document.getElementById('width-slider');
+        const height_slider = document.getElementById('height-slider');
+        width_slider.addEventListener('input', function() {
+            if (shapeModel) {
+                shapeModel.setWidth(width_slider.value);
+            }
+        })
+        height_slider.addEventListener('input', function() {
+            if (shapeModel) {
+                shapeModel.setHeight(height_slider.value);
+            }
+        })
+    }
+    
+
 }
