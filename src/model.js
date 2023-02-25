@@ -19,6 +19,9 @@ class Point {
     this.color = color;
     this.id = id;
   }
+
+  setColor = (color) => 
+  this.color = color;
 }
 
 class Model {
@@ -194,9 +197,9 @@ class Rectangle extends Model {
     this.vertices[0].coordinate = coordinate1;
     this.vertices[0].color = color1;
     this.vertices[1].coordinate = new Coordinate([coordinate2.x, coordinate1.y]);
-    this.vertices[1].color = color2;
+    this.vertices[1].color = color3;
     this.vertices[2].coordinate = coordinate2;
-    this.vertices[2].color = color3;
+    this.vertices[2].color = color2;
     this.vertices[3].coordinate = new Coordinate([coordinate1.x, coordinate2.y]);
     this.vertices[3].color = color4;
 

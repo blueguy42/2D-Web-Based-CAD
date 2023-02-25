@@ -37,6 +37,9 @@ var moveIsEdgeExist = false;
 
 var selectedModel = null;
 
+var lastSelectedModelId = null;
+var lastSelectedVerticeId = null;
+
 colorWheel.value = chosenColor;
 colorWheel.style.backgroundColor = chosenColor;
 colorLabel.innerText = chosenColor;
@@ -45,6 +48,12 @@ colorWheel.addEventListener('change', function(e) {
     chosenColor = e.target.value;
     colorLabel.innerText = e.target.value;
     console.log(`Color wheel: ${chosenColor}`);
+    if (lastSelectedModelId != null){
+        resetCanvasLabel()
+        models[lastSelectedModelId].vertices[lastSelectedVerticeId].setColor(new Color(chosenColor));
+        models[lastSelectedModelId].render();
+
+    }
 })
 
 canvas.addEventListener('mousedown', function(e) {
@@ -157,10 +166,17 @@ canvas.addEventListener('mousemove', function(e) {
             canvasLabel.innerText += "\nSelectedId: " + selectedModel.id + "\n";
         }
     }
+    
+    // coordinate modes
     if (modeCoordinate == 0) {
         canvasLabel.innerText += "x: " + getCanvastoWebGL_X(canvas, coordinate[0]).toFixed(5) + "\ny: " + getCanvastoWebGL_Y(canvas, coordinate[1]).toFixed(5);
     } else {
         canvasLabel.innerText += "x: " + coordinate[0].toFixed(0) + "\ny: " + coordinate[1].toFixed(0);
+    }
+
+    // selected shape
+    if (lastSelectedModelId != null) {
+        canvasLabel.innerText += "\n\nSelectedModelId: " + lastSelectedModelId + "\nSelectedVertexId: " + lastSelectedVerticeId;   
     }
 })
 
@@ -208,6 +224,12 @@ canvas.addEventListener('click', function(e) {
             handleShapeSelected(selectedModel);
             canvasLabel.innerText += "SelectedId: " + selectedModel.id + "\n";
         }
+    } else if (modeMoveCorner != 0){
+        let corners = getNearCornersId(models, coordinate);
+        if (corners.length > 0) {
+            lastSelectedModelId = corners[0][0]; lastSelectedVerticeId = corners[0][1];
+            resetCanvasLabel();
+        }
     }
 })
 
@@ -223,30 +245,7 @@ canvas.addEventListener('dblclick', function(e) {
 })
 
 canvas.addEventListener('mouseleave', function(e) {
-    if (modeLine != 0) {
-        canvasLabel.innerText = "Drawing line";
-    } else if (modeSquare != 0) {
-        canvasLabel.innerText = "Drawing square";
-    } else if (modeRectangle != 0) {
-        canvasLabel.innerText = "Drawing rectangle";
-    } else if (modePolygon != 0) {
-        canvasLabel.innerText = "Drawing polygon";
-        if (modeConvex == 1) {
-            canvasLabel.innerText += "\nConvex mode";
-        } else {
-            canvasLabel.innerText += "\nNon-convex mode";
-        }
-    } else if (modeMoveCorner != 0) {
-        canvasLabel.innerText = "Moving corner";
-    } else if(modeSelect!=0) {
-        canvasLabel.innerText = "Selecting model\n";
-        if(selectedModel) {
-            canvasLabel.innerText += "SelectedId: " + selectedModel.id + "\n";
-        }
-    } else {
-        canvasLabel.innerText = "";
-    }
-    crosshair = [];
+    resetCanvasLabel();
 })
 
 btn_line.addEventListener('click', function(e) {lineMode()})

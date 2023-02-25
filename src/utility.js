@@ -212,6 +212,7 @@ lineMode = () => {
     if (modeLine == 0) {
         handleShapeUnselected();
         modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
+        lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_line.classList.add("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
@@ -236,6 +237,7 @@ squareMode = () => {
     if (modeSquare == 0) {
         handleShapeUnselected();
         modeLine = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
+        lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_square.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
@@ -260,6 +262,7 @@ rectangleMode = () => {
     if (modeRectangle == 0) {
         handleShapeUnselected();
         modeLine = 0; modeSquare = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
+        lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_rectangle.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
@@ -283,6 +286,7 @@ rectangleMode = () => {
 polygonMode = () => {
     if (modePolygon == 0) {
         modeLine = 0; modeSquare = 0; modeRectangle = 0; modeMoveCorner = 0; modeSelect = 0;
+        lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_polygon.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
@@ -470,6 +474,7 @@ moveCorner = () => {
 selectMode = () => {
     if (modeSelect == 0) {
         modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner=0;
+        lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
@@ -537,4 +542,38 @@ handleShapeSelected = (shapeModel) => {
     }
     
 
+}
+
+// Misc
+
+resetCanvasLabel = () => {
+    if (modeLine != 0) {
+        canvasLabel.innerText = "Drawing line";
+    } else if (modeSquare != 0) {
+        canvasLabel.innerText = "Drawing square";
+    } else if (modeRectangle != 0) {
+        canvasLabel.innerText = "Drawing rectangle";
+    } else if (modePolygon != 0) {
+        canvasLabel.innerText = "Drawing polygon";
+        if (modeConvex == 1) {
+            canvasLabel.innerText += "\nConvex mode";
+        } else {
+            canvasLabel.innerText += "\nNon-convex mode";
+        }
+    } else if (modeMoveCorner != 0) {
+        canvasLabel.innerText = "Moving corner";
+    } else if(modeSelect!=0) {
+        canvasLabel.innerText = "Selecting model\n";
+        if(selectedModel) {
+            canvasLabel.innerText += "\nSelectedModel: " + selectedModel.type + "\n";
+            canvasLabel.innerText += "SelectedId: " + selectedModel.id + "\n";
+        }
+    } else {
+        canvasLabel.innerText = "";
+    }
+
+    if (modeMoveCorner != 0){
+        canvasLabel.innerText += "\n\nSelectedModelId: " + lastSelectedModelId + "\nSelectedVertexId: " + lastSelectedVerticeId;
+    }
+    crosshair = [];
 }
