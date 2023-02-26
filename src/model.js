@@ -30,6 +30,7 @@ class Model {
     this.vertices = [];
     this.type = type;
     this.center = new Point();
+    this.rotation = 0;
   }
 
   addVertex = (coordinate, color) => {
@@ -62,11 +63,32 @@ class Model {
   }
 
   translate = (diffX,diffY) => {
-    this.vertices.forEach((vertex) => {
+    for (let i = 0; i< this.vertices.length; i++) {
+      let vertex = this.vertices[i];
       vertex.coordinate.x += diffX;
       vertex.coordinate.y += diffY;
-    });
+      this.guides[i].setGuide(vertex.coordinate);
+    }
     this.setupCenterForModel();
+  }
+
+  rotate = (diffRotate) => {
+    let diffRotateRadian = diffRotate * Math.PI / 180;
+    for(let i = 0; i < this.vertices.length; i++) {
+      let vertex = this.vertices[i];
+      let x = vertex.coordinate.x - this.center.coordinate.x;
+      let y = vertex.coordinate.y - this.center.coordinate.y;
+      let newX = x * Math.cos(diffRotateRadian) - y * Math.sin(diffRotateRadian);
+      let newY = x * Math.sin(diffRotateRadian) + y * Math.cos(diffRotateRadian);
+      vertex.coordinate.x = newX + this.center.coordinate.x;
+      vertex.coordinate.y = newY + this.center.coordinate.y;
+      this.guides[i].setGuide(vertex.coordinate);
+    }
+    this.rotation += diffRotate;
+  }
+
+  unrotate = (angle) => {
+    this.rotate(-angle);
   }
 }
 
@@ -228,10 +250,12 @@ class Rectangle extends Model {
   getWidth = () => {
     return euclideanDistance(
       this.vertices[0].coordinate.x, this.vertices[0].coordinate.y, 
-      this.vertices[1].coordinate.x, this.vertices[0].coordinate.y);
+      this.vertices[1].coordinate.x, this.vertices[1].coordinate.y);
   }
 
   setWidth = (newWidth) => {
+    let tempRotation = this.rotation;
+    this.unrotate(tempRotation);
     let oldWidth = this.getWidth();
     let ratio = newWidth / oldWidth;
     let bottom_midpoint = new Coordinate(
@@ -248,6 +272,7 @@ class Rectangle extends Model {
       new Coordinate([new_x1, new_y1]), this.vertices[0].color, 
       new Coordinate([new_x2, new_y2]), this.vertices[2].color,
       this.vertices[1].color, this.vertices[3].color);
+    this.rotate(tempRotation);
   }
 
   getHeight = () => {
@@ -257,6 +282,8 @@ class Rectangle extends Model {
   }
 
   setHeight = (newHeight) => {
+    let tempRotation = this.rotation;
+    this.unrotate(tempRotation);
     let oldHeight = this.getHeight();
     let ratio = newHeight / oldHeight;
     let left_midpoint = new Coordinate(
@@ -273,6 +300,7 @@ class Rectangle extends Model {
       new Coordinate([new_x1, new_y1]), this.vertices[0].color,
       new Coordinate([new_x2, new_y2]), this.vertices[2].color,
       this.vertices[1].color, this.vertices[3].color);
+    this.rotate(tempRotation);
   }
 
   render = () => {

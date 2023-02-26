@@ -468,6 +468,8 @@ moveCorner = () => {
         btn_movecorner.classList.add("btn-purple");
         canvasLabel.innerText = "Moving corner";
         btn_convex.style.visibility = 'hidden';
+        handleShapeUnselected();
+        transformation_sidebar.style.visibility = 'hidden';
         tempModel = [];
         crosshair = [];
         modeMoveCorner = 1;
@@ -569,6 +571,11 @@ translateSelectedX = (newX) => {
 translateSelectedY = (newY) => {
     let diffY = newY - selectedModel.center.coordinate.y;
     selectedModel.translate(0,diffY);
+}
+
+rotateSelected = (newRotation) => {
+    let diffRotate = newRotation - selectedModel.rotation;
+    selectedModel.rotate(diffRotate);
 }
 
 // Misc
