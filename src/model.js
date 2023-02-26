@@ -529,9 +529,32 @@ class Polygon extends Model {
     this.setupCenterForModel();
   }
 
+  addDuplicateCorner = () => {
+    console.log("jir mulai duplicate");
+    let coordinate1 = new Coordinate([this.vertices[this.vertices.length-1].coordinate.x, this.vertices[this.vertices.length-1].coordinate.y]);
+    let color1 = new Color();
+    color1.r = this.vertices[this.vertices.length-1].color.r;
+    color1.g = this.vertices[this.vertices.length-1].color.g;
+    color1.b = this.vertices[this.vertices.length-1].color.b;
+    this.addCorner(coordinate1, color1);
+  }
+
+  removeCorner = (idx) => {
+    this.vertices.splice(idx,1);
+    this.guides.splice(idx,1);
+    this.setupCenterForModel();
+  }
+
   makePolygon = () => {
     this.vertices = this.vertices.slice(0, -3);
     this.guides = this.guides.slice(0, -3);
+    this.makeConvexHull();
+    this.setupCenterForModel();
+  }
+
+  makePolygonFromAdd = () => {
+    this.vertices = this.vertices.slice(0, -1);
+    this.guides = this.guides.slice(0, -1);
     this.makeConvexHull();
     this.setupCenterForModel();
   }

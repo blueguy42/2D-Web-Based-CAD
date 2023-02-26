@@ -19,6 +19,9 @@ const transformation_sidebar = document.getElementById('transformation');
 const x_slider = document.getElementById('x-slider');
 const y_slider = document.getElementById('y-slider');
 const rotation_slider = document.getElementById('rotation-slider');
+const polygon_special = document.getElementById('polygon-special');
+const btn_addPoly = document.getElementById('btn-add-poly');
+const btn_removePoly = document.getElementById('btn-remove-poly');
 
 var chosenColor = getRandomColor();
 
@@ -34,6 +37,8 @@ var modeCoordinate = 0;
 var modeConvex = 0;
 var modeMoveCorner = 0;
 var modeSelect = 0;
+var modeAddPoly = 0;
+var modeRemovePoly = 0;
 
 var moveCorners = [];
 var moveMousePos = [];
@@ -86,7 +91,7 @@ canvas.addEventListener('mousemove', function(e) {
     canvas.style.cursor = "default";
     canvasLabel.innerText = "";
     if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner != 0 || modeSelect != 0) {
-        if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner == 2) {
+        if (modeLine != 0 || modeSquare != 0 || modeRectangle != 0 || modePolygon != 0 || modeMoveCorner == 2 || modeAddPoly != 0) {
             canvas.style.cursor = "crosshair";
             let crosshairX = new Line(crosshair.length);
             crosshairX.setLine(new Coordinate([0, coordinate[1]]), new Color("#777777"), new Coordinate([canvas.clientWidth, coordinate[1]]), new Color("#777777"));
@@ -132,7 +137,20 @@ canvas.addEventListener('mousemove', function(e) {
         } else if (modeMoveCorner != 0) {
             canvasLabel.innerText += "Moving corner";
         } else if(modeSelect != 0) {
-            canvasLabel.innerText += "Selecting model";
+            if(modeAddPoly==0 && modeRemovePoly==0) {
+                canvasLabel.innerText += "Selecting model";
+            } else {
+                if(modeAddPoly != 0) {
+                    canvasLabel.innerText += "Adding vertices to polygon";
+                } else if(modeRemovePoly != 0) {
+                    canvasLabel.innerText += "Removing vertices from polygon";
+                }
+                if(selectedModel.convex) {
+                    canvasLabel.innerText += "\nConvex mode";
+                } else {
+                    canvasLabel.innerText += "\nNon-convex mode";
+                }
+            } 
         }
         canvasLabel.innerText += `\n`;
     }
@@ -182,16 +200,31 @@ canvas.addEventListener('mousemove', function(e) {
             canvasLabel.innerText += `SelectedModelId: ${moveCorners[0][0]}\nSelectedVertexId: ${moveCorners[0][1]}\n`;
         }
     } else if(modeSelect != 0) {
-        let hovered = getNearPoint(coordinate);
-        if(hovered[0] && hovered[1] == -1) { //center
-            canvas.style.cursor = "pointer";
-            canvasLabel.innerText += "\nHoveredId: " + hovered[0].id + "\n";
+        if(modeAddPoly==0 && modeRemovePoly==0) {
+            let hovered = getNearPoint(coordinate);
+            if(hovered[0] && hovered[1] == -1) { //center
+                canvas.style.cursor = "pointer";
+                canvasLabel.innerText += "\nHoveredId: " + hovered[0].id + "\n";
+            } else {
+                canvasLabel.innerText += "\n";
+            }
+            if(selectedModel) {
+                canvasLabel.innerText += "SelectedModel: " + selectedModel.type;
+                canvasLabel.innerText += "\nSelectedId: " + selectedModel.id + "\n";
+            }
         } else {
-            canvasLabel.innerText += "\n";
-        }
-        if(selectedModel) {
-            canvasLabel.innerText += "SelectedModel: " + selectedModel.type;
+            canvasLabel.innerText += "\nSelectedModel: " + selectedModel.type;
             canvasLabel.innerText += "\nSelectedId: " + selectedModel.id + "\n";
+            if(modeAddPoly != 0) {
+                console.log("Masih add poly jir");
+                selectedModel.setLastCorner(new Coordinate(coordinate), new Color(chosenColor));
+            } else if(modeRemovePoly != 0) {
+                let hovered = getNearPointInSelected(coordinate);
+                if(hovered != -1) {
+                    canvas.style.cursor = "pointer";
+                    canvasLabel.innerText += "HoveredVertexId: " + hovered + "\n";
+                }
+            }
         }
     }
     
@@ -246,12 +279,27 @@ canvas.addEventListener('click', function(e) {
     } else if (modePolygon == 2) {
         tempModel[0].addCorner(new Coordinate(coordinate), new Color(chosenColor));
     } else if(modeSelect != 0) {
-        let hovered = getNearPoint(coordinate);
-        if(hovered[0] && hovered[1] == -1) { //center
-            selectedModel = hovered[0];
-            handleShapeSelected(selectedModel);
-            setupTransformation();
-            canvasLabel.innerText += "\nSelectedId: " + selectedModel.id + "\n";
+        if(modeAddPoly==0 && modeRemovePoly==0) {
+            let hovered = getNearPoint(coordinate);
+            if(hovered[0] && hovered[1] == -1) { //center
+                selectedModel = hovered[0];
+                handleShapeSelected(selectedModel);
+                setupTransformation();
+                canvasLabel.innerText += "\nSelectedId: " + selectedModel.id + "\n";
+            }
+        } else{
+            if(modeAddPoly != 0) {
+                selectedModel.addCorner(new Coordinate(coordinate), new Color(chosenColor));
+            } else if(modeRemovePoly !=0) {
+                let hovered = getNearPointInSelected(coordinate);
+                if(hovered != -1) {
+                    if(selectedModel.vertices.length > 1) {
+                        selectedModel.removeCorner(hovered);
+                    } else {
+                        console.log("cannot remove all vertices");
+                    }
+                }
+            }
         }
     } else if (modeMoveCorner != 0){
         let corners = getNearCornersId(models, coordinate);
@@ -292,6 +340,8 @@ btn_select.addEventListener('click', function(e) {selectMode()})
 x_slider.addEventListener('input', function(e) {translateSelectedX(x_slider.value)})
 y_slider.addEventListener('input', function(e) {translateSelectedY(y_slider.value)})
 rotation_slider.addEventListener('input', function(e) {rotateSelected(rotation_slider.value)})
+btn_addPoly.addEventListener('click', function(e) {addPoly()})
+btn_removePoly.addEventListener('click', function(e) {removePoly()})
 
 btn_line.addEventListener('mouseover', function(e) {
     canvasLabel.innerText = "Draw line";
@@ -354,6 +404,14 @@ btn_select.addEventListener('mouseover', function(e) {
     canvasLabel.innerText = "Selecting model";
 })
 
+btn_addPoly.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Adding vertices to polygon";
+})
+
+btn_removePoly.addEventListener('mouseover', function(e) {
+    canvasLabel.innerText = "Removing vertices from polygon";
+})
+
 btn_line.addEventListener('mouseleave', function(e) {
     canvasLabel.innerText = "";
 })
@@ -399,6 +457,14 @@ btn_movecorner.addEventListener('mouseleave', function(e) {
 })
 
 btn_select.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_addPoly.addEventListener('mouseleave', function(e) {
+    canvasLabel.innerText = "";
+})
+
+btn_removePoly.addEventListener('mouseleave', function(e) {
     canvasLabel.innerText = "";
 })
 

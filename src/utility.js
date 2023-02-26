@@ -98,6 +98,15 @@ getNearPoint = ([x,y]) => {
     return result;
 }
 
+getNearPointInSelected = ([x,y]) => {
+    for(let j = selectedModel.vertices.length-1;j>=0;j--) {
+        if(euclideanDistance(x,y, selectedModel.vertices[j].coordinate.x, selectedModel.vertices[j].coordinate.y) <= 6) {
+            return j;
+        }
+    }
+    return -1;
+}
+
 getNearCornersId = (modelArr, [x, y], type="all") => {
     // returns [model id, vertex id, x, y]
     let result = [];
@@ -186,7 +195,7 @@ convexHull = (vertices) => {
 getGuidesofArr = (arr) => {
     let all = [];
     if (arr.length) {
-        if (!modeSelect) {
+        if (!modeSelect ||  modeAddPoly || modeRemovePoly) {
             arr.map(model => model.guides).map(guide => all = all.concat(guide));
         }
         if (!modeMoveCorner) {
@@ -211,7 +220,7 @@ getRandomColor = () => {
 lineMode = () => {
     if (modeLine == 0) {
         handleShapeUnselected();
-        modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
+        modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0; modeRemovePoly = 0;
         lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_line.classList.add("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
@@ -220,10 +229,13 @@ lineMode = () => {
         btn_movecorner.classList.remove("btn-purple");
         btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
-        handleShapeUnselected();
         transformation_sidebar.style.visibility = 'hidden';
+        btn_removePoly.classList.remove("btn-purple");
+        stopAddPolygon();
+        polygon_special.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing line";
         tempModel = [];
+        selectedModel = null;
         modeLine = 1;
         console.log(`Drawing line`);
     } else if (modeLine == 1 || modeLine == 2) {
@@ -238,7 +250,7 @@ lineMode = () => {
 squareMode = () => {
     if (modeSquare == 0) {
         handleShapeUnselected();
-        modeLine = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
+        modeLine = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0; modeRemovePoly = 0;
         lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_square.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
@@ -247,10 +259,13 @@ squareMode = () => {
         btn_movecorner.classList.remove("btn-purple");
         btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
-        handleShapeUnselected();
         transformation_sidebar.style.visibility = 'hidden';
+        btn_removePoly.classList.remove("btn-purple");
+        stopAddPolygon();
+        polygon_special.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing square";
         tempModel = [];
+        selectedModel = null;
         modeSquare = 1;
         console.log(`Drawing square`);
     } else if (modeSquare == 1 || modeSquare == 2) {
@@ -265,7 +280,7 @@ squareMode = () => {
 rectangleMode = () => {
     if (modeRectangle == 0) {
         handleShapeUnselected();
-        modeLine = 0; modeSquare = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0;
+        modeLine = 0; modeSquare = 0; modePolygon = 0; modeMoveCorner = 0; modeSelect = 0; modeRemovePoly = 0;
         lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_rectangle.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
@@ -274,10 +289,13 @@ rectangleMode = () => {
         btn_movecorner.classList.remove("btn-purple");
         btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
-        handleShapeUnselected();
         transformation_sidebar.style.visibility = 'hidden';
+        btn_removePoly.classList.remove("btn-purple");
+        stopAddPolygon();
+        polygon_special.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing rectangle";
         tempModel = [];
+        selectedModel = null;
         modeRectangle = 1;
         console.log(`Drawing rectangle`);
     } else if (modeRectangle == 1 || modeRectangle == 2) {
@@ -291,7 +309,7 @@ rectangleMode = () => {
 
 polygonMode = () => {
     if (modePolygon == 0) {
-        modeLine = 0; modeSquare = 0; modeRectangle = 0; modeMoveCorner = 0; modeSelect = 0;
+        modeLine = 0; modeSquare = 0; modeRectangle = 0; modeMoveCorner = 0; modeSelect = 0; modeRemovePoly = 0;
         lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_polygon.classList.add("button-shape-selected");
         btn_line.classList.remove("button-shape-selected");
@@ -302,6 +320,9 @@ polygonMode = () => {
         btn_convex.style.visibility='visible'
         handleShapeUnselected();
         transformation_sidebar.style.visibility = 'hidden';
+        btn_removePoly.classList.remove("btn-purple");
+        stopAddPolygon();
+        polygon_special.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing polygon";
         if (modeConvex == 1) {
             canvasLabel.innerText += "\nConvex mode";
@@ -309,6 +330,7 @@ polygonMode = () => {
             canvasLabel.innerText += "\nNon-convex mode";
         }
         tempModel = [];
+        selectedModel = null;
         modePolygon = 1;
         console.log(`Drawing polygon`);
     } else {
@@ -463,7 +485,7 @@ randomColor = () => {
 moveCorner = () => {
     if (modeMoveCorner == 0) {
         handleShapeUnselected();
-        modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeSelect = 0;
+        modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeSelect = 0; modeRemovePoly = 0;
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
@@ -472,8 +494,10 @@ moveCorner = () => {
         btn_movecorner.classList.add("btn-purple");
         canvasLabel.innerText = "Moving corner";
         btn_convex.style.visibility = 'hidden';
-        handleShapeUnselected();
         transformation_sidebar.style.visibility = 'hidden';
+        btn_removePoly.classList.remove("btn-purple");
+        stopAddPolygon();
+        polygon_special.style.visibility = 'hidden';
         tempModel = [];
         crosshair = [];
         modeMoveCorner = 1;
@@ -487,13 +511,16 @@ moveCorner = () => {
 
 selectMode = () => {
     if (modeSelect == 0) {
-        modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner=0;
+        modeLine = 0; modeSquare = 0; modeRectangle = 0; modePolygon = 0; modeMoveCorner=0; modeRemovePoly = 0;
         lastSelectedModelId = null; lastSelectedVerticeId = null;
         btn_line.classList.remove("button-shape-selected");
         btn_square.classList.remove("button-shape-selected");
         btn_rectangle.classList.remove("button-shape-selected");
         btn_polygon.classList.remove("button-shape-selected");
-        btn_movecorner.classList.remove("btn-purple");        
+        btn_movecorner.classList.remove("btn-purple");   
+        btn_convex.style.visibility = 'hidden';
+        btn_removePoly.classList.remove("btn-purple");
+        stopAddPolygon();
         btn_select.classList.add("btn-purple");
         canvasLabel.innerText = "Selecting model";
         tempModel = [];
@@ -501,12 +528,54 @@ selectMode = () => {
         console.log(`Selecting model`);
     } else if (modeSelect == 1) {
         btn_select.classList.remove("btn-purple");
-        handleShapeUnselected();
         transformation_sidebar.style.visibility = 'hidden';
+        btn_removePoly.classList.remove("btn-purple");
+        stopAddPolygon();
+        polygon_special.style.visibility = 'hidden';
         canvasLabel.innerText = "";
         modeSelect = 0;
         selectedModel = null;
         handleShapeUnselected();
+    }
+}
+
+addPoly = () => {
+    if(modeAddPoly == 0) {
+        modeRemovePoly = 0;
+        transformation_sidebar.style.visibility = 'hidden';
+        btn_removePoly.classList.remove("btn-purple");
+        btn_addPoly.classList.add("btn-purple");
+        canvasLabel.innerText = "Adding vertices to polygon";
+        modeAddPoly = 1;
+        console.log(`Adding polygon`);
+        selectedModel.addDuplicateCorner();
+    } else if(modeAddPoly == 1) {
+        console.log("jir dimatiin add nya")
+        stopAddPolygon();
+        setupTransformation();
+    }
+}
+
+removePoly = () => {
+    if(modeRemovePoly == 0) {
+        stopAddPolygon();
+        btn_removePoly.classList.add("btn-purple");
+        canvasLabel.innerText = "Removing vertices from polygon";
+        modeRemovePoly = 1;
+        console.log(`Removing polygon`);
+    } else if(modeRemovePoly == 1) {
+        btn_removePoly.classList.remove("btn-purple");
+        canvasLabel.innerText = "";
+        modeRemovePoly = 0;
+    }
+}
+
+stopAddPolygon = () => {
+    if(modeAddPoly == 1) {
+        selectedModel.makePolygonFromAdd();
+        modeAddpoly = 0;
+        console.log("jir udah mode 0");
+        btn_addPoly.classList.remove("btn-purple");
     }
 }
 
@@ -515,6 +584,12 @@ handleShapeUnselected = () => {
 }
 
 handleShapeSelected = (shapeModel) => {
+    if(shapeModel.type != "polygon") {
+        polygon_special.style.visibility = 'hidden';
+    } else if(shapeModel.type == "polygon") {
+        polygon_special.style.visibility = 'visible';
+    }
+
     // input an h4 that contains the shape name into property sidebar div
     let inner = "";
     if(shapeModel.type == "line") {
