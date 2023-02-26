@@ -470,39 +470,13 @@ class Square extends Rectangle {
   }
 
   getLength = () => {
-    return euclideanDistance(
-      this.vertices[0].coordinate.x, this.vertices[0].coordinate.y,
-      this.vertices[1].coordinate.x, this.vertices[1].coordinate.y
-    )
+
+    return this.getHeight()
   }
   
   setLength = (newLength) => {
-    let oldLength = this.getLength();
-    let ratio = newLength/oldLength;
-
-    let center_x = (
-      this.vertices[0].coordinate.x + this.vertices[1].coordinate.x 
-      + this.vertices[2].coordinate.x + this.vertices[3].coordinate.x)/4;
-    let center_y = (
-      this.vertices[0].coordinate.y + this.vertices[1].coordinate.y 
-      + this.vertices[2].coordinate.y + this.vertices[3].coordinate.y)/4;
-    let center = new Coordinate([center_x, center_y]);
-
-    let new_x1 = center.x + ((this.vertices[0].coordinate.x - center.x) * ratio);
-    let new_y1 = center.y + ((this.vertices[0].coordinate.y - center.y) * ratio);
-    let new_x2 = center.x + ((this.vertices[1].coordinate.x - center.x) * ratio);
-    let new_y2 = center.y + ((this.vertices[1].coordinate.y - center.y) * ratio);
-    let new_x3 = center.x + ((this.vertices[2].coordinate.x - center.x) * ratio);
-    let new_y3 = center.y + ((this.vertices[2].coordinate.y - center.y) * ratio);
-    let new_x4 = center.x + ((this.vertices[3].coordinate.x - center.x) * ratio);
-    let new_y4 = center.y + ((this.vertices[3].coordinate.y - center.y) * ratio);
-    
-    this.setSquare4Coloured(
-      new Coordinate([new_x1, new_y1]), this.vertices[0].color,
-      new Coordinate([new_x2, new_y2]), this.vertices[1].color,
-      new Coordinate([new_x3, new_y3]), this.vertices[2].color,
-      new Coordinate([new_x4, new_y4]), this.vertices[3].color
-    )
+    this.setHeight(newLength);
+    this.setWidth(newLength);
   }
 }
 

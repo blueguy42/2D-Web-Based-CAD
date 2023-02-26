@@ -182,18 +182,6 @@ canvas.addEventListener('mousemove', function(e) {
                         coordinate[0] - moveMousePos[0] + moveCorners[0][2],
                         coordinate[1] - moveMousePos[1] + moveCorners[0][3],
                     ])
-                    // setNearCornersCoordinate = (modelArr, [startX, startY], [endX, endY], nearcorners) => {
-                        //     // sets corner vertex and guide from getNearCorners to new coordinate in relation to mouse position
-                    //     let corner0 = nearcorners[0];
-                    //     let model = modelArr[corner0[0]];
-                    //     let vertex = model.vertices[corner0[1]];
-                    //     vertex.coordinate.x = endX - startX + corner0[2];
-                    //     vertex.coordinate.y = endY - startY + corner0[3];
-                    //     let newGuide = new Guide(corner0[1]);
-                    //     newGuide.setGuide(new Coordinate([vertex.coordinate.x, vertex.coordinate.y]));
-                    //     model.guides[corner0[1]] = newGuide;
-                    //     model.setupCenterForModel();
-                    // }
             } else {
                 setNearCornersCoordinate(models, moveMousePos, coordinate, moveCorners);
             }
