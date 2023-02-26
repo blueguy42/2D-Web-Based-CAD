@@ -305,6 +305,59 @@ class Rectangle extends Model {
     this.rotate(tempRotation);
   }
 
+  resetCoords = (coordinate1, coordinate2, coordinate3, coordinate4) => {
+    this.vertices[0].coordinate = coordinate1;
+    this.vertices[1].coordinate = coordinate2;
+    this.vertices[2].coordinate = coordinate3;
+    this.vertices[3].coordinate = coordinate4;
+
+    this.guides[0].setGuide(coordinate1);
+    this.guides[1].setGuide(coordinate2);
+    this.guides[2].setGuide(coordinate3);
+    this.guides[3].setGuide(coordinate4);
+    this.setupCenterForModel();
+  }
+
+  adjustCorner = (cornerId, [newX, newY]) => {
+    let tempRotation = this.rotation;
+    this.unrotate(tempRotation);
+
+    let midpoint = new Coordinate(
+      [
+        (this.vertices[0].coordinate.x + this.vertices[1].coordinate.x + this.vertices[2].coordinate.x + this.vertices[3].coordinate.x)/4,
+        (this.vertices[0].coordinate.y + this.vertices[1].coordinate.y + this.vertices[2].coordinate.y + this.vertices[3].coordinate.y)/4
+      ]
+    );
+
+    let oldDistanceToMiddle = euclideanDistance(
+      this.vertices[cornerId].coordinate.x, this.vertices[cornerId].coordinate.y,
+      midpoint.x, midpoint.y
+    ) 
+    let newDistanceToMiddle = euclideanDistance(
+      newX, newY,
+      midpoint.x, midpoint.y
+    )
+    let ratio = newDistanceToMiddle / oldDistanceToMiddle;
+
+    let new_x1 = (this.vertices[0].coordinate.x - midpoint.x) * ratio + midpoint.x;
+    let new_y1 = (this.vertices[0].coordinate.y - midpoint.y) * ratio + midpoint.y;
+    let new_x2 = (this.vertices[1].coordinate.x - midpoint.x) * ratio + midpoint.x;
+    let new_y2 = (this.vertices[1].coordinate.y - midpoint.y) * ratio + midpoint.y;
+    let new_x3 = (this.vertices[2].coordinate.x - midpoint.x) * ratio + midpoint.x;
+    let new_y3 = (this.vertices[2].coordinate.y - midpoint.y) * ratio + midpoint.y;
+    let new_y4 = (this.vertices[3].coordinate.y - midpoint.y) * ratio + midpoint.y;
+    let new_x4 = (this.vertices[3].coordinate.x - midpoint.x) * ratio + midpoint.x;
+
+    this.resetCoords(
+      new Coordinate([new_x1, new_y1]),
+      new Coordinate([new_x2, new_y2]),
+      new Coordinate([new_x3, new_y3]),
+      new Coordinate([new_x4, new_y4])
+    )
+
+    this.rotate(tempRotation);
+  }
+  
   render = () => {
     const rectangleVertices = [];
 
