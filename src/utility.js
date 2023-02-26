@@ -39,11 +39,23 @@ getCenterPoint = (vertices) => {
         x += vertex.coordinate.x;
         y += vertex.coordinate.y;
     });
+    x /= vertices.length;
+    y /= vertices.length;
     let centerColor = new Color();
-    centerColor.r = vertices[0].color.r;
-    centerColor.g = vertices[0].color.g;
-    centerColor.b = vertices[0].color.b;
-    return new Point(new Coordinate([x / vertices.length, y / vertices.length]), centerColor);
+    centerColor.r = 0;
+    centerColor.g = 0;
+    centerColor.b = 0;
+    let totalDistance = 0;
+    vertices.forEach(vertex => {
+        centerColor.r += vertex.color.r*euclideanDistance(x, y, vertex.coordinate.x, vertex.coordinate.y);
+        centerColor.g += vertex.color.g*euclideanDistance(x, y, vertex.coordinate.x, vertex.coordinate.y);
+        centerColor.b += vertex.color.b*euclideanDistance(x, y, vertex.coordinate.x, vertex.coordinate.y);
+        totalDistance += euclideanDistance(x, y, vertex.coordinate.x, vertex.coordinate.y);
+    })
+    centerColor.r /= totalDistance;
+    centerColor.g /= totalDistance;
+    centerColor.b /= totalDistance;
+    return new Point(new Coordinate([x, y]), centerColor);
 }
 
 sortAntiClockwise = (vertices) => {
