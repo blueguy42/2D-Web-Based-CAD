@@ -378,6 +378,10 @@ saveModel = () => {
                 vertex.coordinate.x = getCanvastoWebGL_X(canvas,vertex.coordinate.x);
                 vertex.coordinate.y = getCanvastoWebGL_Y(canvas,vertex.coordinate.y);
             })
+            model.centerGuide.vertices.forEach(vertex => {
+                vertex.coordinate.x = getCanvastoWebGL_X(canvas,vertex.coordinate.x);
+                vertex.coordinate.y = getCanvastoWebGL_Y(canvas,vertex.coordinate.y);
+            })
             model.guides.forEach(guide => {
                 guide.vertices.forEach(vertex => {
                     vertex.coordinate.x = getCanvastoWebGL_X(canvas,vertex.coordinate.x);
@@ -497,6 +501,8 @@ selectMode = () => {
         console.log(`Selecting model`);
     } else if (modeSelect == 1) {
         btn_select.classList.remove("btn-purple");
+        handleShapeUnselected();
+        transformation_sidebar.style.visibility = 'hidden';
         canvasLabel.innerText = "";
         modeSelect = 0;
         selectedModel = null;

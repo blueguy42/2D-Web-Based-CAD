@@ -49,12 +49,14 @@ class Model {
   copy = (other) => {
     this.vertices = [];
     this.guides = [];
+    this.rotation = other.rotation;
     other.vertices.forEach((vertex) => {
       this.addVertex(vertex.coordinate, vertex.color);
       let guide = new Guide(this.guides.length);
       guide.setGuide(vertex.coordinate);
       this.guides.push(guide);
     })
+    this.setupCenterForModel();
   }
 
   setupCenterForModel = () => {
