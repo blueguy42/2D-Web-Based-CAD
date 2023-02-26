@@ -15,6 +15,10 @@ const btn_randomcolor = document.getElementById('btn-random-color');
 const btn_movecorner = document.getElementById('btn-move-corner');
 const btn_select = document.getElementById('btn-select');
 const property_sidebar = document.getElementById('property');
+const transformation_sidebar = document.getElementById('transformation');
+const x_slider = document.getElementById('x-slider');
+const y_slider = document.getElementById('y-slider');
+const rotation_slider = document.getElementById('rotation-slider');
 
 var chosenColor = getRandomColor();
 
@@ -51,11 +55,9 @@ colorWheel.addEventListener('change', function(e) {
     if (lastSelectedModelId != null & modeMoveCorner != 0){
         resetCanvasLabel()
         models[lastSelectedModelId].vertices[lastSelectedVerticeId].setColor(new Color(chosenColor));
-        models[lastSelectedModelId].render();
     } else if (modeSelect != 0 & selectedModel != null){
         resetCanvasLabel()
         selectedModel.setColor(new Color(chosenColor));
-        selectedModel.render();
     }
 })
 
@@ -162,10 +164,12 @@ canvas.addEventListener('mousemove', function(e) {
         let hovered = getNearPoint(coordinate);
         if(hovered[0] && hovered[1] == -1) { //center
             canvas.style.cursor = "pointer";
-            canvasLabel.innerText += "\nHoveredId: " + hovered[0].id;
+            canvasLabel.innerText += "\nHoveredId: " + hovered[0].id + "\n";
+        } else {
+            canvasLabel.innerText += "\n";
         }
         if(selectedModel) {
-            canvasLabel.innerText += "\nSelectedModel: " + selectedModel.type;
+            canvasLabel.innerText += "SelectedModel: " + selectedModel.type;
             canvasLabel.innerText += "\nSelectedId: " + selectedModel.id + "\n";
         }
     }
@@ -225,7 +229,8 @@ canvas.addEventListener('click', function(e) {
         if(hovered[0] && hovered[1] == -1) { //center
             selectedModel = hovered[0];
             handleShapeSelected(selectedModel);
-            canvasLabel.innerText += "SelectedId: " + selectedModel.id + "\n";
+            setupTransformation();
+            canvasLabel.innerText += "\nSelectedId: " + selectedModel.id + "\n";
         }
     } else if (modeMoveCorner != 0){
         let corners = getNearCornersId(models, coordinate);
@@ -263,6 +268,9 @@ btn_clear.addEventListener('click', function(e) {clearModel()})
 btn_randomcolor.addEventListener('click', function(e) {randomColor()})
 btn_movecorner.addEventListener('click', function(e) {moveCorner()})
 btn_select.addEventListener('click', function(e) {selectMode()})
+x_slider.addEventListener('input', function(e) {translateSelectedX(x_slider.value)})
+y_slider.addEventListener('input', function(e) {translateSelectedY(y_slider.value)})
+rotation_slider.addEventListener('input', function(e) {rotateSelected(rotation_slider.value)})
 
 btn_line.addEventListener('mouseover', function(e) {
     canvasLabel.innerText = "Draw line";

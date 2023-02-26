@@ -60,6 +60,14 @@ class Model {
     this.center = getCenterPoint(this.vertices);
     this.centerGuide.setCenterGuide(this.center.coordinate);
   }
+
+  translate = (diffX,diffY) => {
+    this.vertices.forEach((vertex) => {
+      vertex.coordinate.x += diffX;
+      vertex.coordinate.y += diffY;
+    });
+    this.setupCenterForModel();
+  }
 }
 
 class Line extends Model {

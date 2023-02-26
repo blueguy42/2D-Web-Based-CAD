@@ -31,13 +31,20 @@
         <div class="sidebar-sliders" id="property">
           <!-- Intentionally empty, will be filled later when a shape is selected -->
         </div>
-        <!-- <div class="sidebar-item" id="transformation"> -->
-          <!-- <input type="number" id="input-rotate" placeholder="0" min="0" max="360">
-          <button class="button-shape" id="btn-rotate" type="button">Rotate</button>
-          <input type="number" id="input-scale-x" placeholder="0">
-          <input type="number" id="input-scale-y" placeholder="0">
-          <button class="button-shape" id="btn-scale" type="button">Scale</button> -->
-        <!-- </div> -->
+        <div class="sidebar-sliders" style="visibility: hidden" id="transformation">
+          <div>
+          <h4>X</h4>
+          <input type="range" min="0" max="1000" value="0" class="slider" id="x-slider">
+        </div>
+          <div>
+            <h4>Y</h4>
+            <input type="range" min="0" max="500" value="0" class="slider" id="y-slider">
+          </div>
+          <div>
+            <h4>Rotation</h4>
+            <input type="range" min="0" max="360" value="0" class="slider" id="rotation-slider">
+          </div>
+        </div>
       </div>
     </div>
     <div id="div-btn-card">

@@ -220,6 +220,8 @@ lineMode = () => {
         btn_movecorner.classList.remove("btn-purple");
         btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
+        handleShapeUnselected();
+        transformation_sidebar.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing line";
         tempModel = [];
         modeLine = 1;
@@ -245,6 +247,8 @@ squareMode = () => {
         btn_movecorner.classList.remove("btn-purple");
         btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
+        handleShapeUnselected();
+        transformation_sidebar.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing square";
         tempModel = [];
         modeSquare = 1;
@@ -270,6 +274,8 @@ rectangleMode = () => {
         btn_movecorner.classList.remove("btn-purple");
         btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility = 'hidden';
+        handleShapeUnselected();
+        transformation_sidebar.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing rectangle";
         tempModel = [];
         modeRectangle = 1;
@@ -294,6 +300,8 @@ polygonMode = () => {
         btn_movecorner.classList.remove("btn-purple");
         btn_select.classList.remove("btn-purple");
         btn_convex.style.visibility='visible'
+        handleShapeUnselected();
+        transformation_sidebar.style.visibility = 'hidden';
         canvasLabel.innerText = "Drawing polygon";
         if (modeConvex == 1) {
             canvasLabel.innerText += "\nConvex mode";
@@ -539,9 +547,28 @@ handleShapeSelected = (shapeModel) => {
                 shapeModel.setHeight(height_slider.value);
             }
         })
+    } else if(shapeModel.type == "polygon") {
+        property_sidebar.innerHTML = "";
     }
     
 
+}
+
+setupTransformation = () => {
+    x_slider.value = selectedModel.center.coordinate.x;
+    y_slider.value = selectedModel.center.coordinate.y;
+    rotation_slider.value = selectedModel.rotation;
+    transformation_sidebar.style.visibility = 'visible';
+}
+
+translateSelectedX = (newX) => {
+    let diffX = newX - selectedModel.center.coordinate.x;
+    selectedModel.translate(diffX,0);
+}
+
+translateSelectedY = (newY) => {
+    let diffY = newY - selectedModel.center.coordinate.y;
+    selectedModel.translate(0,diffY);
 }
 
 // Misc
