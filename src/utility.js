@@ -550,7 +550,6 @@ addPoly = () => {
         console.log(`Adding polygon`);
         selectedModel.addDuplicateCorner();
     } else if(modeAddPoly == 1) {
-        console.log("jir dimatiin add nya")
         stopAddPolygon();
         setupTransformation();
     }
@@ -573,8 +572,7 @@ removePoly = () => {
 stopAddPolygon = () => {
     if(modeAddPoly == 1) {
         selectedModel.makePolygonFromAdd();
-        modeAddpoly = 0;
-        console.log("jir udah mode 0");
+        modeAddPoly = 0;
         btn_addPoly.classList.remove("btn-purple");
     }
 }

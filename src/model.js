@@ -530,7 +530,6 @@ class Polygon extends Model {
   }
 
   addDuplicateCorner = () => {
-    console.log("jir mulai duplicate");
     let coordinate1 = new Coordinate([this.vertices[this.vertices.length-1].coordinate.x, this.vertices[this.vertices.length-1].coordinate.y]);
     let color1 = new Color();
     color1.r = this.vertices[this.vertices.length-1].color.r;

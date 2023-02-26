@@ -216,7 +216,6 @@ canvas.addEventListener('mousemove', function(e) {
             canvasLabel.innerText += "\nSelectedModel: " + selectedModel.type;
             canvasLabel.innerText += "\nSelectedId: " + selectedModel.id + "\n";
             if(modeAddPoly != 0) {
-                console.log("Masih add poly jir");
                 selectedModel.setLastCorner(new Coordinate(coordinate), new Color(chosenColor));
             } else if(modeRemovePoly != 0) {
                 let hovered = getNearPointInSelected(coordinate);
