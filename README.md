@@ -1,4 +1,4 @@
-# IF3260 Computer Graphics: Major Assignment 2
+# IF3260 Computer Graphics: Major Assignment 1
 
 ## Description
 A web implementation of pure WebGL for drawing, editing, and visualizing models on a canvas, with the following features:
