@@ -14,7 +14,7 @@ A web implementation of pure WebGL for drawing, editing, and visualizing models 
 
 3. Moving corner points of a model while maintaining congruency in the case of squares and rectangles
 4. Changing the color of a single corner point or all corner points of a model
-5. Saving models and importing models from JSON files
+5. Saving and importing models from JSON files
 
 ## How to Run the Program
 1. Open the file `src/index.html` in a web browser
